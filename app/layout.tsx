@@ -95,7 +95,7 @@ export default function RootLayout({
                   Back to Nexitel &rarr;
                 </a>
                 <a
-                  href="https://nexitel.us/plans"
+                  href="https://nexitel.us/blue-plans"
                   className="bg-nexitel-gradient text-white text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -141,7 +141,7 @@ export default function RootLayout({
                   </li>
                   <li>
                     <a
-                      href="https://nexitel.us/plans"
+                      href="https://nexitel.us/blue-plans"
                       className="hover:text-white transition-colors"
                     >
                       Plans
@@ -149,18 +149,18 @@ export default function RootLayout({
                   </li>
                   <li>
                     <a
-                      href="https://nexitel.us/coverage"
+                      href="https://nexitel.us/purple-plans"
                       className="hover:text-white transition-colors"
                     >
-                      Coverage Map
+                      Purple Plans
                     </a>
                   </li>
                   <li>
                     <a
-                      href="https://nexitel.us/esim"
+                      href="https://nexitel.us/data-plans"
                       className="hover:text-white transition-colors"
                     >
-                      eSIM
+                      Data Plans
                     </a>
                   </li>
                   <li>
@@ -190,7 +190,7 @@ export default function RootLayout({
                   </li>
                   <li>
                     <a
-                      href="https://nexitel.us/contact"
+                      href="https://nexitel.us/support"
                       className="hover:text-white transition-colors"
                     >
                       Contact Us
@@ -198,26 +198,18 @@ export default function RootLayout({
                   </li>
                   <li>
                     <a
-                      href="https://nexitel.us/faq"
+                      href="https://nexitel.us/wholesale"
                       className="hover:text-white transition-colors"
                     >
-                      FAQ
+                      Wholesale
                     </a>
                   </li>
                   <li>
                     <a
-                      href="https://nexitel.us/terms"
+                      href="https://nexitel.us/compare"
                       className="hover:text-white transition-colors"
                     >
-                      Terms of Service
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="https://nexitel.us/privacy"
-                      className="hover:text-white transition-colors"
-                    >
-                      Privacy Policy
+                      Compare Plans
                     </a>
                   </li>
                 </ul>

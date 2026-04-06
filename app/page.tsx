@@ -19,7 +19,7 @@ export default function HomePage() {
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <a
-              href="https://nexitel.us/plans"
+              href="https://nexitel.us/blue-plans"
               className="bg-nexitel-gradient text-white font-semibold px-6 py-3 rounded-lg hover:opacity-90 transition-opacity"
               target="_blank"
               rel="noopener noreferrer"
@@ -128,7 +128,7 @@ export default function HomePage() {
             coverage. Plans start at just $15/month.
           </p>
           <a
-            href="https://nexitel.us/plans"
+            href="https://nexitel.us/blue-plans"
             className="inline-block bg-nexitel-gradient text-white font-semibold px-8 py-4 rounded-lg hover:opacity-90 transition-opacity text-lg"
             target="_blank"
             rel="noopener noreferrer"

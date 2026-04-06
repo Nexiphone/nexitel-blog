@@ -231,7 +231,7 @@ export default function BlogPostPage({ params }: Props) {
                     Check out Nexitel prepaid plans starting at $15/mo.
                   </p>
                   <a
-                    href="https://nexitel.us/plans"
+                    href="https://nexitel.us/blue-plans"
                     className="block text-center bg-nexitel-gradient text-white text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
                     target="_blank"
                     rel="noopener noreferrer"
