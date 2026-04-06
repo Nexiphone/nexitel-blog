@@ -28,6 +28,13 @@ export interface Translations {
     readyToSave: string;
     checkOutPlans: string;
   };
+  contact: {
+    title: string;
+    subtitle: string;
+    whatsapp: string;
+    telegram: string;
+    wechat: string;
+  };
   footer: {
     quickLinks: string;
     support: string;
@@ -85,6 +92,13 @@ const translations: Record<Locale, Translations> = {
       readyToSave: 'Ready to save on wireless?',
       checkOutPlans: 'Check out Nexitel prepaid plans starting at $15/mo.',
     },
+    contact: {
+      title: 'Contact Us',
+      subtitle: 'Have questions? Reach out to us on your favorite platform.',
+      whatsapp: 'WhatsApp',
+      telegram: 'Telegram',
+      wechat: 'WeChat',
+    },
     footer: {
       quickLinks: 'Quick Links',
       support: 'Support',
@@ -140,6 +154,13 @@ const translations: Record<Locale, Translations> = {
       browseAllPlans: '浏览所有套餐',
       readyToSave: '准备好节省无线费用了吗？',
       checkOutPlans: '查看 Nexitel 预付费套餐，低至每月15美元。',
+    },
+    contact: {
+      title: '联系我们',
+      subtitle: '有问题？通过您喜欢的平台联系我们。',
+      whatsapp: 'WhatsApp',
+      telegram: 'Telegram',
+      wechat: '微信',
     },
     footer: {
       quickLinks: '快速链接',
@@ -198,6 +219,13 @@ const translations: Record<Locale, Translations> = {
       readyToSave: '¿Listo para ahorrar en servicio móvil?',
       checkOutPlans:
         'Descubre los planes prepago de Nexitel desde $15/mes.',
+    },
+    contact: {
+      title: 'Contáctanos',
+      subtitle: '¿Tienes preguntas? Comunícate con nosotros en tu plataforma favorita.',
+      whatsapp: 'WhatsApp',
+      telegram: 'Telegram',
+      wechat: 'WeChat',
     },
     footer: {
       quickLinks: 'Enlaces rápidos',
