@@ -24,11 +24,11 @@ export default function LocaleHomePage({ params }: Props) {
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="bg-nexitel-dark relative overflow-hidden">
-        <div className="absolute inset-0 bg-nexitel-gradient opacity-10" />
+      {/* Hero Section - matching main site */}
+      <section className="blog-hero-gradient relative overflow-hidden">
+        <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(hsl(0 0% 100% / 0.04) 1px, transparent 1px), linear-gradient(90deg, hsl(0 0% 100% / 0.04) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 animate-fade-in-up" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             <span className="gradient-text">{t.nav.nexitelBlog}</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
@@ -37,7 +37,7 @@ export default function LocaleHomePage({ params }: Props) {
           <div className="mt-8 flex justify-center gap-4">
             <a
               href="https://nexitel.us/blue-plans"
-              className="bg-nexitel-gradient text-white font-semibold px-6 py-3 rounded-lg hover:opacity-90 transition-opacity"
+              className="btn-vibrant text-base"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -68,7 +68,7 @@ export default function LocaleHomePage({ params }: Props) {
             <Link
               key={post.slug}
               href={`/${locale}/blog/${post.slug}`}
-              className="group block bg-white rounded-xl border border-gray-200 hover:border-nexitel-purple/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 overflow-hidden"
+              className="group block glow-card overflow-hidden"
             >
               {/* Card Image */}
               <div className="h-48 bg-nexitel-gradient-dark relative overflow-hidden">
@@ -91,7 +91,7 @@ export default function LocaleHomePage({ params }: Props) {
                 )}
                 {/* Category Badge */}
                 <div className="absolute top-4 left-4">
-                  <span className="bg-nexitel-purple/90 text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
+                  <span className="tag-pill text-[10px]">
                     {post.category}
                   </span>
                 </div>
@@ -141,7 +141,7 @@ export default function LocaleHomePage({ params }: Props) {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-nexitel-dark">
+      <section className="blog-hero-gradient">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             {t.cta.title}
@@ -149,7 +149,7 @@ export default function LocaleHomePage({ params }: Props) {
           <p className="text-gray-300 mb-8 text-lg">{t.cta.description}</p>
           <a
             href="https://nexitel.us/blue-plans"
-            className="inline-block bg-nexitel-gradient text-white font-semibold px-8 py-4 rounded-lg hover:opacity-90 transition-opacity text-lg"
+            className="btn-vibrant text-lg px-8 py-4"
             target="_blank"
             rel="noopener noreferrer"
           >
