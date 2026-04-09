@@ -5,7 +5,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin', 'latin-ext'] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://blog.nexitel.us'),
+  metadataBase: new URL('https://blog.nexivolt.us'),
   title: {
     default: 'Nexitel Blog - Prepaid Wireless Insights & Guides',
     template: '%s | Nexitel Blog',

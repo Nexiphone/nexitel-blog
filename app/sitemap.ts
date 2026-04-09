@@ -8,7 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Add locale homepages
   for (const locale of locales) {
     entries.push({
-      url: `https://blog.nexitel.us/${locale}`,
+      url: `https://blog.nexivolt.us/${locale}`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1.0,
@@ -18,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     const posts = getAllPosts(locale as Locale);
     for (const post of posts) {
       entries.push({
-        url: `https://blog.nexitel.us/${locale}/blog/${post.slug}`,
+        url: `https://blog.nexivolt.us/${locale}/blog/${post.slug}`,
         lastModified: new Date(post.date),
         changeFrequency: 'monthly',
         priority: 0.8,

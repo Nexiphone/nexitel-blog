@@ -2,7 +2,7 @@
 const nextConfig = {
   output: 'standalone',
   images: {
-    domains: ['nexitel.us', 'blog.nexitel.us'],
+    domains: ['nexivolt.us', 'blog.nexivolt.us'],
   },
 };
 
