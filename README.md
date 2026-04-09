@@ -1,8 +1,8 @@
 # Nexitel Blog
 
-The official blog for [Nexitel](https://nexivolt.us) - affordable prepaid wireless plans with no contracts.
+The official blog for [Nexitel](https://nexitel.us) - affordable prepaid wireless plans with no contracts.
 
-Hosted at [blog.nexivolt.us](https://blog.nexivolt.us).
+Hosted at [blog.nexitel.us](https://blog.nexitel.us).
 
 ## Tech Stack
 
@@ -91,14 +91,14 @@ nexitel-blog/
 
 ## Deployment
 
-This project is configured for Vercel deployment. Connect the repository to Vercel and set the custom domain to `blog.nexivolt.us`.
+This project is configured for Vercel deployment. Connect the repository to Vercel and set the custom domain to `blog.nexitel.us`.
 
 ### Vercel Settings
 
 - **Framework Preset:** Next.js
 - **Build Command:** `npm run build`
 - **Output Directory:** (default)
-- **Domain:** blog.nexivolt.us
+- **Domain:** blog.nexitel.us
 
 ## SEO Features
 

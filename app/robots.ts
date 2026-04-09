@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
       },
     ],
-    sitemap: 'https://blog.nexivolt.us/sitemap.xml',
+    sitemap: 'https://blog.nexitel.us/sitemap.xml',
   };
 }

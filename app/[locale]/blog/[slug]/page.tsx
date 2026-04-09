@@ -46,11 +46,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'article',
       publishedTime: post.date,
       authors: [post.author],
-      url: `https://blog.nexivolt.us/${locale}/blog/${post.slug}`,
+      url: `https://blog.nexitel.us/${locale}/blog/${post.slug}`,
       siteName: t.nav.nexitelBlog,
       images: [
         {
-          url: post.image?.startsWith('/') ? `https://blog.nexivolt.us${post.image}` : 'https://blog.nexivolt.us/og-default.png',
+          url: post.image?.startsWith('/') ? `https://blog.nexitel.us${post.image}` : 'https://blog.nexitel.us/og-default.png',
           width: 1200,
           height: 630,
           alt: post.title,
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.description,
     },
     alternates: {
-      canonical: `https://blog.nexivolt.us/${locale}/blog/${post.slug}`,
+      canonical: `https://blog.nexitel.us/${locale}/blog/${post.slug}`,
       languages: Object.fromEntries(
         locales
           .filter((loc) => {
@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             const exists = getPostBySlug(params.slug, loc);
             return exists !== null;
           })
-          .map((loc) => [loc, `https://blog.nexivolt.us/${loc}/blog/${post.slug}`])
+          .map((loc) => [loc, `https://blog.nexitel.us/${loc}/blog/${post.slug}`])
       ),
     },
   };
@@ -158,27 +158,27 @@ export default function BlogPostPage({ params }: Props) {
     '@type': 'Article',
     headline: post.title,
     description: post.description,
-    image: post.image || 'https://blog.nexivolt.us/og-default.png',
+    image: post.image || 'https://blog.nexitel.us/og-default.png',
     datePublished: post.date,
     dateModified: post.date,
     inLanguage: localeMap[locale],
     author: {
       '@type': 'Organization',
       name: post.author,
-      url: 'https://nexivolt.us',
+      url: 'https://nexitel.us',
     },
     publisher: {
       '@type': 'Organization',
       name: 'Nexitel',
-      url: 'https://nexivolt.us',
+      url: 'https://nexitel.us',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://nexivolt.us/logo.png',
+        url: 'https://nexitel.us/logo.png',
       },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://blog.nexivolt.us/${locale}/blog/${post.slug}`,
+      '@id': `https://blog.nexitel.us/${locale}/blog/${post.slug}`,
     },
   };
 
@@ -287,7 +287,7 @@ export default function BlogPostPage({ params }: Props) {
                     {t.cta.checkOutPlans}
                   </p>
                   <a
-                    href="https://nexivolt.us/blue-plans"
+                    href="https://nexitel.us/blue-plans"
                     className="block text-center bg-nexitel-gradient text-white text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
                     target="_blank"
                     rel="noopener noreferrer"

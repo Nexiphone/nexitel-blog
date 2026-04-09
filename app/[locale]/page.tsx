@@ -36,7 +36,7 @@ export default function LocaleHomePage({ params }: Props) {
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <a
-              href="https://nexivolt.us/blue-plans"
+              href="https://nexitel.us/blue-plans"
               className="btn-vibrant text-base"
               target="_blank"
               rel="noopener noreferrer"
@@ -148,7 +148,7 @@ export default function LocaleHomePage({ params }: Props) {
           </h2>
           <p className="text-gray-300 mb-8 text-lg">{t.cta.description}</p>
           <a
-            href="https://nexivolt.us/blue-plans"
+            href="https://nexitel.us/blue-plans"
             className="btn-vibrant text-lg px-8 py-4"
             target="_blank"
             rel="noopener noreferrer"
