@@ -1,0 +1,49 @@
+name: Daily Telegram post
+
+on:
+  # 13:17 UTC ~ 9:17 AM Eastern. Off-the-hour to avoid the GitHub Actions
+  # cron stampede that can delay jobs by 10+ minutes.
+  schedule:
+    - cron: '17 13 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-telegram-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Send Telegram posts
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID_EN: ${{ secrets.TELEGRAM_CHAT_ID_EN }}
+          TELEGRAM_CHAT_ID_ZH: ${{ secrets.TELEGRAM_CHAT_ID_ZH }}
+          TELEGRAM_CHAT_ID_ES: ${{ secrets.TELEGRAM_CHAT_ID_ES }}
+          BLOG_BASE_URL: ${{ vars.BLOG_BASE_URL || 'https://nexitel.com' }}
+        run: npm run post:telegram
+
+      - name: Commit updated posted-log
+        run: |
+          if ! git diff --quiet -- scripts/posted-log.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add scripts/posted-log.json
+            git commit -m "chore: record telegram posts for $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "posted-log.json unchanged; nothing to commit."
+          fi
