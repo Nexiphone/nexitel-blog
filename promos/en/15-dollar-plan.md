@@ -1,7 +1,7 @@
 ---
 id: 15-dollar-plan
 type: plan
-cta_url: https://nexitel.com/en/plans
+cta_url: https://nexitel.us/blue-plans
 cta_text: View plans
 priority: 0
 ---
