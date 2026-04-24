@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "post:telegram": "node scripts/post-to-telegram.mjs"
+    "post:telegram": "node scripts/post-to-telegram.mjs",
+    "post:promo": "node scripts/post-promo-to-telegram.mjs"
   },
   "dependencies": {
     "next": "14.2.15",
