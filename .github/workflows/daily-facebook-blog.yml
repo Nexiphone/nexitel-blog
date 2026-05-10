@@ -1,0 +1,46 @@
+name: Daily Facebook blog post
+
+on:
+  # 13:32 UTC ~ 9:32 AM Eastern. 15 min after the Telegram blog cron so the
+  # two platforms don't post at the exact same minute.
+  schedule:
+    - cron: '32 13 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-facebook-blog
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install --no-audit --no-fund
+
+      - name: Send Facebook blog post
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          BLOG_BASE_URL: ${{ vars.BLOG_BASE_URL || 'https://nexitel-blog.vercel.app' }}
+        run: npm run post:fb-blog
+
+      - name: Commit updated fb-blog-log
+        run: |
+          if ! git diff --quiet -- scripts/fb-blog-log.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add scripts/fb-blog-log.json
+            git commit -m "chore: record fb blog post for $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "fb-blog-log.json unchanged; nothing to commit."
+          fi

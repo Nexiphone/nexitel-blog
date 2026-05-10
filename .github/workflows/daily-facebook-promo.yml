@@ -1,0 +1,45 @@
+name: Daily Facebook promo post
+
+on:
+  # 21:32 UTC ~ 5:32 PM Eastern. 15 min after the Telegram promo cron so the
+  # two platforms don't post at the exact same minute.
+  schedule:
+    - cron: '32 21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-facebook-promo
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install --no-audit --no-fund
+
+      - name: Send Facebook promo post
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+        run: npm run post:fb-promo
+
+      - name: Commit updated fb-promo-log
+        run: |
+          if ! git diff --quiet -- scripts/fb-promo-log.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add scripts/fb-promo-log.json
+            git commit -m "chore: record fb promo post for $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "fb-promo-log.json unchanged; nothing to commit."
+          fi

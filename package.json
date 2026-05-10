@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "post:telegram": "node scripts/post-to-telegram.mjs",
-    "post:promo": "node scripts/post-promo-to-telegram.mjs"
+    "post:promo": "node scripts/post-promo-to-telegram.mjs",
+    "post:fb-blog": "node scripts/post-blog-to-facebook.mjs",
+    "post:fb-promo": "node scripts/post-promo-to-facebook.mjs"
   },
   "dependencies": {
     "next": "14.2.15",
