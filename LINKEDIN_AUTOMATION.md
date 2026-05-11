@@ -1,6 +1,13 @@
 # Social automation — LinkedIn
 
-Auto-posts one blog entry at 13:47 UTC and one promo at 21:47 UTC daily to the Nexitel LinkedIn Company Page, rotating EN/ZH/ES.
+Auto-posts one blog entry at 13:47 UTC and one promo at 21:47 UTC daily to LinkedIn, rotating EN/ZH/ES.
+
+The scripts support **two posting modes**:
+
+1. **Personal profile** (via "Share on LinkedIn" product — Default Tier, auto-approved). Set `LI_PERSON_ID` secret. **This is the recommended starting point** because the product is approved instantly.
+2. **Company Page** (via "Community Management API" — requires LinkedIn approval, often gated for new apps). Set `LI_ORGANIZATION_ID` secret.
+
+Pick one, set the corresponding secret. The script auto-detects which mode based on which secret is present.
 
 - Blog script: [scripts/post-blog-to-linkedin.mjs](scripts/post-blog-to-linkedin.mjs)
 - Promo script: [scripts/post-promo-to-linkedin.mjs](scripts/post-promo-to-linkedin.mjs)
@@ -36,15 +43,19 @@ On your new app's dashboard, look at the right sidebar. Next to the Nexitel page
 
 This step grants your app posting authority on the page.
 
-### Step 4 — Request the Community Management API product
+### Step 4 — Request the right product
+
+**For personal-profile posting (recommended starting path):**
 
 1. On the app dashboard → **Products** tab
-2. Find **Community Management API** in the catalog → click **Request access**
-3. Agree to LinkedIn's terms → submit
+2. Find **Share on LinkedIn** (Default Tier) → click **Request access**
+3. Agree to LinkedIn's terms → **auto-approved instantly**
 
-**This is auto-approved within ~1 minute** for pages you admin. Refresh the page; "Community Management API" should appear in the **Added products** section.
+**For Company Page posting (if Community Management API is available):**
 
-If after 1 hour it's still "Pending review", that's unusual — escalate via LinkedIn's developer support, but in practice this auto-approves immediately.
+1. **Products** tab → find **Community Management API**
+2. If **Request access** is clickable, click it and agree. Often auto-approved for pages you admin.
+3. If it's greyed out, LinkedIn has restricted this product for your app. Either fall back to personal-profile mode, or visit the [Access Request Form](https://linkedin.com/help/linkedin/answer/a1342443) — manual approval takes days/weeks.
 
 ### Step 5 — Generate an OAuth access token
 
@@ -57,6 +68,12 @@ LinkedIn requires the **Authorization Code flow** (no implicit/password grants).
 
 Then, in your browser address bar, paste this URL (replace `{CLIENT_ID}`):
 
+**For personal-profile mode** (Share on LinkedIn — recommended):
+```
+https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id={CLIENT_ID}&redirect_uri=https://oauth.pstmn.io/v1/callback&scope=w_member_social%20openid%20profile
+```
+
+**For Company Page mode** (Community Management API):
 ```
 https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id={CLIENT_ID}&redirect_uri=https://oauth.pstmn.io/v1/callback&scope=w_organization_social%20r_organization_admin
 ```
@@ -93,9 +110,18 @@ Response:
 
 Copy the `access_token`.
 
-### Step 6 — Find your Organization ID
+### Step 6 — Find your Person ID or Organization ID
 
-In Terminal (replace `{ACCESS_TOKEN}` with the token from step 5):
+**For personal-profile mode** — fetch your Person ID:
+
+```sh
+curl -H 'Authorization: Bearer {ACCESS_TOKEN}' \
+     'https://api.linkedin.com/v2/userinfo'
+```
+
+Response includes `"sub": "AbC123XyZ"` — that's your Person ID. Copy it.
+
+**For Company Page mode** — fetch your Organization ID:
 
 ```sh
 curl -H 'Authorization: Bearer {ACCESS_TOKEN}' \
@@ -113,7 +139,10 @@ In GitHub: **Settings → Secrets and variables → Actions → New repository s
 | Name | Value |
 | --- | --- |
 | `LI_ACCESS_TOKEN` | the access token from step 5 |
-| `LI_ORGANIZATION_ID` | the numeric org ID from step 6 |
+| `LI_PERSON_ID` *(personal mode)* | the Person ID from step 6 |
+| `LI_ORGANIZATION_ID` *(Company Page mode)* | the numeric org ID from step 6 |
+
+Set only **one** of `LI_PERSON_ID` / `LI_ORGANIZATION_ID` based on which mode you're using. The script auto-picks.
 
 ### Step 8 — Test the workflow
 

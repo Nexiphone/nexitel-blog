@@ -89,9 +89,9 @@ function buildCommentary(promo) {
   return parts.join('\n');
 }
 
-async function postToLinkedIn(orgId, token, commentary) {
+async function postToLinkedIn(authorUrn, token, commentary) {
   const body = {
-    author: `urn:li:organization:${orgId}`,
+    author: authorUrn,
     commentary,
     visibility: 'PUBLIC',
     distribution: {
@@ -119,11 +119,22 @@ async function postToLinkedIn(orgId, token, commentary) {
   return res.headers.get('x-restli-id') || 'unknown';
 }
 
+// Build the author URN. Accepts either a person ID (Share on LinkedIn /
+// w_member_social) or an organization ID (Community Management API /
+// w_organization_social) via the LI_AUTHOR_URN env var. Falls back to the
+// older LI_ORGANIZATION_ID for backward compatibility.
+function resolveAuthorUrn() {
+  if (process.env.LI_AUTHOR_URN) return process.env.LI_AUTHOR_URN;
+  if (process.env.LI_PERSON_ID) return `urn:li:person:${process.env.LI_PERSON_ID}`;
+  if (process.env.LI_ORGANIZATION_ID) return `urn:li:organization:${process.env.LI_ORGANIZATION_ID}`;
+  return null;
+}
+
 async function main() {
   const token = process.env.LI_ACCESS_TOKEN;
-  const orgId = process.env.LI_ORGANIZATION_ID;
-  if (!token || !orgId) {
-    console.error('LI_ACCESS_TOKEN and LI_ORGANIZATION_ID must be set.');
+  const authorUrn = resolveAuthorUrn();
+  if (!token || !authorUrn) {
+    console.error('LI_ACCESS_TOKEN must be set, and one of LI_AUTHOR_URN, LI_PERSON_ID, or LI_ORGANIZATION_ID.');
     process.exit(1);
   }
 
@@ -154,10 +165,10 @@ async function main() {
 
   const promo = pickNext(active, log.history[locale]);
   const commentary = buildCommentary(promo);
-  console.log(`[li-promo] posting "${promo.id}" to org ${orgId}`);
+  console.log(`[li-promo] posting "${promo.id}" as ${authorUrn}`);
 
   try {
-    const postId = await postToLinkedIn(orgId, token, commentary);
+    const postId = await postToLinkedIn(authorUrn, token, commentary);
     console.log(`[li-promo] posted: ${postId}`);
     log.history[locale][promo.id] = now.toISOString();
     log.next_locale = NEXT_LOCALE[locale];
