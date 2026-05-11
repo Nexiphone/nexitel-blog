@@ -10,7 +10,9 @@
     "post:telegram": "node scripts/post-to-telegram.mjs",
     "post:promo": "node scripts/post-promo-to-telegram.mjs",
     "post:fb-blog": "node scripts/post-blog-to-facebook.mjs",
-    "post:fb-promo": "node scripts/post-promo-to-facebook.mjs"
+    "post:fb-promo": "node scripts/post-promo-to-facebook.mjs",
+    "post:li-blog": "node scripts/post-blog-to-linkedin.mjs",
+    "post:li-promo": "node scripts/post-promo-to-linkedin.mjs"
   },
   "dependencies": {
     "next": "14.2.15",

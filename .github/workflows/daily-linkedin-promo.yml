@@ -1,0 +1,44 @@
+name: Daily LinkedIn promo post
+
+on:
+  # 21:47 UTC ~ 5:47 PM Eastern. 15 min after FB promo, 30 after Telegram promo.
+  schedule:
+    - cron: '47 21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-linkedin-promo
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install --no-audit --no-fund
+
+      - name: Send LinkedIn promo post
+        env:
+          LI_ACCESS_TOKEN: ${{ secrets.LI_ACCESS_TOKEN }}
+          LI_ORGANIZATION_ID: ${{ secrets.LI_ORGANIZATION_ID }}
+        run: npm run post:li-promo
+
+      - name: Commit updated li-promo-log
+        run: |
+          if ! git diff --quiet -- scripts/li-promo-log.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add scripts/li-promo-log.json
+            git commit -m "chore: record linkedin promo post for $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "li-promo-log.json unchanged; nothing to commit."
+          fi

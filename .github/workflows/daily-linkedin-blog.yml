@@ -1,0 +1,45 @@
+name: Daily LinkedIn blog post
+
+on:
+  # 13:47 UTC ~ 9:47 AM Eastern. 15 min after FB blog, 30 after Telegram blog.
+  schedule:
+    - cron: '47 13 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-linkedin-blog
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install --no-audit --no-fund
+
+      - name: Send LinkedIn blog post
+        env:
+          LI_ACCESS_TOKEN: ${{ secrets.LI_ACCESS_TOKEN }}
+          LI_ORGANIZATION_ID: ${{ secrets.LI_ORGANIZATION_ID }}
+          BLOG_BASE_URL: ${{ vars.BLOG_BASE_URL || 'https://nexitel-blog.vercel.app' }}
+        run: npm run post:li-blog
+
+      - name: Commit updated li-blog-log
+        run: |
+          if ! git diff --quiet -- scripts/li-blog-log.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add scripts/li-blog-log.json
+            git commit -m "chore: record linkedin blog post for $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "li-blog-log.json unchanged; nothing to commit."
+          fi
