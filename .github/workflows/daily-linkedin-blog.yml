@@ -28,7 +28,14 @@ jobs:
       - name: Send LinkedIn blog post
         env:
           LI_ACCESS_TOKEN: ${{ secrets.LI_ACCESS_TOKEN }}
+          # Set ONE of these via repo Secrets:
+          #   LI_PERSON_ID         - for personal-profile posting (Share on LinkedIn)
+          #   LI_ORGANIZATION_ID   - for Company Page posting (Community Management API)
+          # LI_AUTHOR_URN overrides both with a full URN string if you ever need
+          # to specify the prefix yourself.
+          LI_PERSON_ID: ${{ secrets.LI_PERSON_ID }}
           LI_ORGANIZATION_ID: ${{ secrets.LI_ORGANIZATION_ID }}
+          LI_AUTHOR_URN: ${{ secrets.LI_AUTHOR_URN }}
           BLOG_BASE_URL: ${{ vars.BLOG_BASE_URL || 'https://nexitel-blog.vercel.app' }}
         run: npm run post:li-blog
 
