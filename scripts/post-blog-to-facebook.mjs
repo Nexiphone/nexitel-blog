@@ -155,16 +155,13 @@ async function main() {
   const url = `${BLOG_BASE_URL}/${locale}/blog/${next.slug}`;
 
   try {
-    if (imagePath && fs.existsSync(imagePath)) {
-      console.log(`[fb-blog] posting "${next.title}" (${next.slug}) with image ${next.image}`);
-      await postPhoto(pageId, token, imagePath, caption);
-    } else {
-      if (imagePath) {
-        console.warn(`[fb-blog] image not found on disk (${imagePath}); falling back to link post.`);
-      }
-      console.log(`[fb-blog] posting "${next.title}" (${next.slug}) as link-only`);
-      await postLink(pageId, token, caption, url);
-    }
+    // Always use /feed (link post). The /photos endpoint requires
+    // pages_read_engagement, which needs App Review approval (weeks).
+    // /feed only needs pages_manage_posts, and FB auto-renders a preview
+    // card using the destination's OpenGraph image/title/description —
+    // visually nearly identical for blog-link posts.
+    console.log(`[fb-blog] posting "${next.title}" (${next.slug}) as link to ${url}`);
+    await postLink(pageId, token, caption, url);
     log.posted[locale].push(next.slug);
     log.next_locale = NEXT_LOCALE[locale];
     writeLog(log);
