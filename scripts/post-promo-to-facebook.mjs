@@ -167,19 +167,15 @@ async function main() {
   const caption = buildCaption(promo);
 
   try {
+    // Always use /feed. The /photos endpoint requires pages_read_engagement,
+    // which needs App Review approval (weeks). /feed only needs
+    // pages_manage_posts and renders a clean preview if cta_url is set.
     if (promo.image) {
-      const imagePath = path.join(imagesRoot, promo.image);
-      if (fs.existsSync(imagePath)) {
-        console.log(`[fb-promo] posting "${promo.id}" with image ${promo.image}`);
-        await postPhoto(pageId, token, imagePath, caption);
-      } else {
-        console.warn(`[fb-promo] image referenced but not found (${imagePath}); falling back to feed post.`);
-        await postFeed(pageId, token, caption, promo.cta_url);
-      }
+      console.log(`[fb-promo] posting "${promo.id}" via /feed (image upload disabled due to perms)`);
     } else {
-      console.log(`[fb-promo] posting "${promo.id}" (text-only via /feed)`);
-      await postFeed(pageId, token, caption, promo.cta_url);
+      console.log(`[fb-promo] posting "${promo.id}" via /feed`);
     }
+    await postFeed(pageId, token, caption, promo.cta_url);
     log.history[locale][promo.id] = now.toISOString();
     log.next_locale = NEXT_LOCALE[locale];
     writeLog(log);
