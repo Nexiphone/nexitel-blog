@@ -18,13 +18,15 @@ const IMAGES_DIR = path.join(process.cwd(), 'public', 'images', 'blog');
 
 // List of topic categories to rotate through
 const TOPIC_CATEGORIES = [
-  { category: 'City Safety', topics: ['parking lot safety', 'public transit safety', 'bar and nightlife safety', 'festival safety', 'neighborhood safety', 'urban biking safety'] },
-  { category: 'Student Safety', topics: ['dorm safety', 'study group safety', 'campus parking safety', 'spring break safety'] },
-  { category: 'Travel Safety', topics: ['airport safety', 'road trip safety', 'hiking safety', 'beach safety', 'cruise ship safety', 'backpacking safety'] },
-  { category: 'Emergency Preparedness', topics: ['first aid basics', 'power outage preparedness', 'home fire safety', 'earthquake readiness', 'tornado safety', 'flood preparedness'] },
-  { category: 'Digital Safety', topics: ['online dating safety', 'social media privacy', 'phone security', 'identity theft prevention'] },
-  { category: 'Family Safety', topics: ['child safety tips', 'teen safety guide', 'pet owner safety', 'babysitter safety guide', 'newborn home safety'] },
-  { category: 'Workplace Safety', topics: ['commute safety', 'late shift worker safety', 'remote worker safety', 'business travel safety'] },
+  { category: 'City Safety', topics: ['parking lot safety', 'public transit safety', 'bar and nightlife safety', 'festival safety', 'neighborhood safety', 'urban biking safety', 'subway safety tips', 'walking dogs safely at night', 'grocery shopping safety', 'ATM safety tips', 'gas station safety', 'farmers market safety', 'sidewalk safety', 'crosswalk safety', 'street vendor interactions', 'busy intersection safety', 'late-night convenience store safety', 'street photography safety', 'urban exploration safety', 'protest and rally safety', 'concert venue safety', 'street fair safety', 'public restroom safety', 'food truck safety', 'tourist district safety', 'downtown safety after dark', 'sporting event safety', 'shopping mall safety', 'food court safety', 'parking garage safety'] },
+  { category: 'Student Safety', topics: ['dorm safety', 'study group safety', 'campus parking safety', 'spring break safety', 'fraternity and sorority party safety', 'late-night library safety', 'roommate safety agreements', 'campus jogging safety', 'study abroad airport safety', 'campus dating safety', 'student housing safety', 'graduate student lab safety', 'commuter student safety', 'online class privacy', 'tutoring session safety', 'campus tour safety', 'orientation week safety', 'finals week stress and safety', 'study group meetup safety', 'campus event safety'] },
+  { category: 'Travel Safety', topics: ['airport safety', 'road trip safety', 'hiking safety', 'beach safety', 'cruise ship safety', 'backpacking safety', 'train travel safety', 'bus travel safety', 'hostel safety', 'Airbnb safety tips', 'car rental safety', 'gas station rest stop safety', 'border crossing safety', 'language barrier emergency tips', 'travel scam awareness', 'currency exchange safety', 'taxi safety abroad', 'pickpocket prevention', 'photography travel safety', 'camping safety', 'national park safety', 'museum and tourist site safety', 'street food safety abroad', 'travel insurance basics', 'lost passport recovery', 'embassy and consulate help', 'altitude sickness prevention', 'jet lag and safety', 'ferry and boat safety', 'desert travel safety'] },
+  { category: 'Emergency Preparedness', topics: ['first aid basics', 'power outage preparedness', 'home fire safety', 'earthquake readiness', 'tornado safety', 'flood preparedness', 'hurricane preparation', 'winter storm safety', 'heatwave safety', 'wildfire evacuation', 'go-bag essentials', 'emergency water supply', 'emergency food storage', 'emergency communication plan', 'CPR basics', 'choking response', 'severe allergy response', 'snake bite first aid', 'severe weather alerts', 'lightning safety', 'gas leak response', 'carbon monoxide awareness', 'home invasion response', 'workplace evacuation plans', 'school emergency drills', 'pandemic preparedness', 'medical emergency at home', 'fall prevention for elderly', 'pet emergency preparedness', 'documenting emergencies for insurance'] },
+  { category: 'Digital Safety', topics: ['online dating safety', 'social media privacy', 'phone security', 'identity theft prevention', 'public WiFi safety', 'password manager basics', 'two-factor authentication guide', 'phishing email detection', 'safe online shopping', 'smart home device security', 'webcam privacy', 'voice assistant privacy', 'kids online safety', 'teen social media safety', 'dating app red flags', 'video chat safety', 'cloud storage privacy', 'data breach response', 'safe file sharing', 'cryptocurrency safety basics', 'NFT scam awareness', 'remote work data security', 'VPN basics', 'phone tracking awareness', 'social engineering defense'] },
+  { category: 'Family Safety', topics: ['child safety tips', 'teen safety guide', 'pet owner safety', 'babysitter safety guide', 'newborn home safety', 'toddler outdoor safety', 'school pickup safety', 'playground safety', 'pool safety for families', 'family vacation safety', 'family hike safety', 'children walking to school', 'kids and strangers training', 'sibling supervision tips', 'family emergency contact tree', 'grandparent care safety', 'family bike ride safety', 'family camping safety', 'visitor and guest safety at home', 'family movie night safety drill'] },
+  { category: 'Workplace Safety', topics: ['commute safety', 'late shift worker safety', 'remote worker safety', 'business travel safety', 'co-working space safety', 'office break-in prevention', 'workplace harassment safety', 'field worker safety', 'real estate agent safety', 'delivery driver safety', 'gig worker safety', 'food delivery rider safety', 'home healthcare worker safety', 'rideshare driver safety', 'night security guard tips', 'small business owner safety', 'retail worker safety', 'bartender safety', 'restaurant server safety', 'hospital worker safety'] },
+  { category: 'Senior Safety', topics: ['elderly fall prevention', 'medication management safety', 'senior driving safety', 'senior dating safety', 'scam awareness for seniors', 'senior travel safety', 'aging in place safety', 'senior bathroom safety', 'senior kitchen safety', 'senior winter walking safety', 'caregiver coordination', 'memory care safety', 'senior fitness safety', 'senior pet safety'] },
+  { category: 'Outdoor Activities', topics: ['running alone safety', 'cycling safety', 'rock climbing safety', 'kayaking safety', 'paddleboard safety', 'fishing trip safety', 'hunting safety', 'mountain biking safety', 'trail running safety', 'cross-country skiing safety', 'snowboarding safety', 'surfing safety', 'open water swimming safety', 'rollerblading safety', 'skateboarding safety', 'horseback riding safety', 'bird watching trip safety', 'foraging trip safety', 'geocaching safety', 'metal detecting safety'] },
 ];
 
 function getExistingSlugs() {
@@ -41,17 +43,37 @@ function pickTopic(existingSlugs) {
     const shuffledTopics = [...cat.topics].sort(() => Math.random() - 0.5);
     for (const topic of shuffledTopics) {
       const slug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      if (!existingSlugs.includes(slug) && !existingSlugs.some(s => s.includes(slug.split('-')[0]))) {
+      // Only skip if exact slug already used (no fuzzy match — was causing false positives)
+      if (!existingSlugs.includes(slug)) {
         return { category: cat.category, topic, slug };
       }
     }
   }
-  // Fallback: timestamped
-  return {
-    category: 'City Safety',
-    topic: `safety tips for ${new Date().toLocaleDateString('en-US', { weekday: 'long' })}s`,
-    slug: `safety-tips-${Date.now()}`,
-  };
+  return null; // Signal to use AI to generate a fresh topic
+}
+
+async function generateFreshTopic(existingSlugs) {
+  const existingList = existingSlugs.join(', ');
+  const prompt = `I run a personal safety blog for the One Tap Alert app. I need a fresh, specific blog post topic about personal safety that is NOT already covered.
+
+Topics already covered (do not repeat or duplicate): ${existingList}
+
+Generate ONE new specific, SEO-friendly safety topic. Pick something unique — a specific scenario, audience, or situation we haven't covered. Be creative but practical (real situations people search for).
+
+Examples of good topics: "Holiday Shopping Safety", "Yoga Studio Safety for Solo Practitioners", "Safety Tips for Dog Park Visits", "Working Late at the Office Alone".
+
+Respond with ONLY a JSON object (no markdown, no code fences) like:
+{"topic":"the topic name","category":"one of: City Safety, Student Safety, Travel Safety, Emergency Preparedness, Digital Safety, Family Safety, Workplace Safety, Senior Safety, Outdoor Activities","slug":"url-friendly-slug-with-dashes"}`;
+
+  const response = await client.messages.create({
+    model: 'claude-sonnet-4-5-20250929',
+    max_tokens: 500,
+    messages: [{ role: 'user', content: prompt }],
+  });
+
+  const text = response.content[0].text.trim().replace(/^```json\n?/, '').replace(/\n?```$/, '');
+  const parsed = JSON.parse(text);
+  return { category: parsed.category, topic: parsed.topic, slug: parsed.slug };
 }
 
 async function downloadImage(slug) {
@@ -194,7 +216,12 @@ async function main() {
   const existingSlugs = getExistingSlugs();
   console.log(`Found ${existingSlugs.length} existing posts`);
 
-  const { category, topic, slug } = pickTopic(existingSlugs);
+  let picked = pickTopic(existingSlugs);
+  if (!picked) {
+    console.log('🤖 Topic rotation exhausted — asking Claude for a fresh topic...');
+    picked = await generateFreshTopic(existingSlugs);
+  }
+  const { category, topic, slug } = picked;
   console.log(`📝 Topic: ${topic} (${category}) → slug: ${slug}`);
 
   // Ensure directories exist
