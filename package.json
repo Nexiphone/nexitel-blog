@@ -12,7 +12,9 @@
     "post:fb-blog": "node scripts/post-blog-to-facebook.mjs",
     "post:fb-promo": "node scripts/post-promo-to-facebook.mjs",
     "post:li-blog": "node scripts/post-blog-to-linkedin.mjs",
-    "post:li-promo": "node scripts/post-promo-to-linkedin.mjs"
+    "post:li-promo": "node scripts/post-promo-to-linkedin.mjs",
+    "social:post": "node scripts/generate-social-post.mjs",
+    "poster:generate": "node scripts/generate-poster.mjs"
   },
   "dependencies": {
     "next": "14.2.15",
@@ -24,7 +26,10 @@
     "remark-html": "^16.0.1"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^20.14.0",
+    "qrcode": "^1.5.4",
+    "satori": "^0.12.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.19",
