@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   },
   description:
     'Expert guides on prepaid wireless plans, eSIM technology, international roaming, 5G coverage, and no-contract phone plans from Nexitel.',
+  verification: {
+    google: 'HK8yo_K8IHxRqi-EeJ0CzNmZKJtSFWS5zttNecIZ_Go',
+  },
 };
 
 export default function RootLayout({
