@@ -184,6 +184,56 @@ async function fetchPhotoDataUri(query, variety) {
   }
 }
 
+/**
+ * No-API-key photo pool: hand-validated Unsplash photos (direct CDN, no key
+ * needed), tagged by theme so each poster gets a RELEVANT, rotating photo —
+ * phones, people using phones, travel, city, remote work. Used when no
+ * PEXELS_API_KEY is set so every poster still has a real, on-topic image.
+ */
+const PHOTO_LIBRARY = [
+  { id: "photo-1511707171634-5f897ff02aa9", tags: ["phone", "apps", "device", "esim", "activation", "setup", "general"] },
+  { id: "photo-1512941937669-90a1b58e7e9c", tags: ["phone", "apps", "device", "esim", "general"] },
+  { id: "photo-1556656793-08538906a9f8", tags: ["phone", "device", "sim", "esim", "plan", "switch", "general"] },
+  { id: "photo-1530319067432-f2a729c03db5", tags: ["phone", "activation", "new", "esim", "setup", "immigrant", "general"] },
+  { id: "photo-1516321318423-f06f85e504b3", tags: ["phone", "online", "digital", "data", "general"] },
+  { id: "photo-1522125670776-3c7abb882bc2", tags: ["phone", "using", "lifestyle", "data", "stream", "text", "talk"] },
+  { id: "photo-1601972602237-8c79241e468b", tags: ["phone", "app", "city", "using", "data", "stream", "general"] },
+  { id: "photo-1565849904461-04a58ad377e0", tags: ["phone", "camera", "outdoor", "travel", "content", "game", "stream"] },
+  { id: "photo-1436491865332-7a61a109cc05", tags: ["airport", "travel", "international", "roam", "nomad", "trip"] },
+  { id: "photo-1469854523086-cc02fe5d8800", tags: ["car", "road", "roadtrip", "travel", "drive", "trip"] },
+  { id: "photo-1507525428034-b723cf961d3e", tags: ["beach", "travel", "vacation", "outdoor", "snowbird"] },
+  { id: "photo-1551632811-561732d1e306", tags: ["hike", "trail", "travel", "outdoor", "adventure", "coverage"] },
+  { id: "photo-1519608487953-e999c86e7455", tags: ["city", "people", "coverage", "urban", "general"] },
+  { id: "photo-1502920917128-1aa500764cbd", tags: ["city", "commute", "street", "coverage", "general"] },
+  { id: "photo-1494790108377-be9c29b29330", tags: ["person", "portrait", "people", "family", "couple", "general"] },
+  { id: "photo-1521737711867-e3b97375f902", tags: ["remote", "work", "laptop", "team", "nomad", "gig", "business", "family"] },
+];
+
+/** Pick the most relevant photo for the tip; rotate by index when nothing matches. */
+function pickPhotoId(content, index) {
+  const hay = `${content.imageQuery || ""} ${content.headline || ""} ${content.tip || ""} ${content.category || ""}`.toLowerCase();
+  let best = null, bestScore = 0;
+  PHOTO_LIBRARY.forEach((p, i) => {
+    const score = p.tags.reduce((s, t) => (t !== "general" && hay.includes(t) ? s + 1 : s), 0);
+    // slight rotation tiebreak so equal-scoring tips don't always pick the same photo
+    const tie = (i + index) % PHOTO_LIBRARY.length === 0 ? 0.1 : 0;
+    if (score + tie > bestScore) { bestScore = score + tie; best = p.id; }
+  });
+  return best || PHOTO_LIBRARY[index % PHOTO_LIBRARY.length].id;
+}
+
+/** Fetch an Unsplash pool photo as a data URI (no API key needed). */
+async function fetchUnsplashDataUri(id) {
+  try {
+    const res = await fetch(`https://images.unsplash.com/${id}?w=1080&h=520&fit=crop&q=80`);
+    if (!res.ok) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    return `data:${res.headers.get("content-type") || "image/jpeg"};base64,${buf.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
 async function renderPoster({ category, headline, tip, photoDataUri, qrDataUri }) {
   const [bold, semi, regular] = await Promise.all([
     readFile(path.join(fontsDir, "Poppins-Bold.ttf")),
@@ -351,8 +401,14 @@ async function main() {
   console.log(`Tip:    ${content.tip}`);
 
   const photoQuery = content.imageQuery || content.headline;
-  const photoDataUri = await fetchPhotoDataUri(photoQuery, history.length);
-  console.log(`Photo:  ${photoDataUri ? `Pexels "${photoQuery}"` : "none (brand gradient header)"}`);
+  let photoDataUri = await fetchPhotoDataUri(photoQuery, history.length);
+  let photoSrc = photoDataUri ? `Pexels "${photoQuery}"` : "";
+  if (!photoDataUri) {
+    const id = pickPhotoId(content, history.length);
+    photoDataUri = await fetchUnsplashDataUri(id);
+    photoSrc = photoDataUri ? `Unsplash ${id}` : "gradient (photo fetch failed)";
+  }
+  console.log(`Photo:  ${photoSrc}`);
 
   const qrDataUri = await QRCode.toDataURL(SITE_URL, {
     margin: 1,
