@@ -1,10 +1,12 @@
 {
-  "next_locale": "zh",
+  "next_locale": "es",
   "posted": {
     "en": [
       "5g-coverage-guide-2026"
     ],
-    "zh": [],
+    "zh": [
+      "5g-coverage-guide-2026"
+    ],
     "es": []
   }
 }
