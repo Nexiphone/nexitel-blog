@@ -1,0 +1,71 @@
+{
+  "_note": "Founder portfolio for the CEO LinkedIn rotation. Edit freely. 'logo' is a filename in scripts/assets/logos/ (square PNG, transparent bg preferred). 'colors' will be tuned to match each logo once provided.",
+  "projects": [
+    {
+      "key": "nexitel",
+      "name": "Nexitel",
+      "category": "Prepaid Wireless",
+      "tagline": "Affordable prepaid wireless, no contract",
+      "blurb": "A prepaid wireless / SIM carrier in the USA: cheap unlimited talk & text, nationwide 5G on major networks, eSIM and physical SIM, easy number transfer. Built for families, travelers, immigrants and budget-conscious users who don't want a contract.",
+      "url": "https://nexitel.us",
+      "cta": "nexitel.us",
+      "colors": { "ink": "#0f0a2e", "ink2": "#1a1145", "accent": "#8b5cf6", "accent2": "#3b82f6", "accentText": "#c4b5fd" },
+      "logo": "nexitel.png"
+    },
+    {
+      "key": "nexitel-dealer",
+      "name": "Nexitel Dealer Program",
+      "category": "Dealer / Reseller Opportunity",
+      "tagline": "Earn by activating prepaid SIMs",
+      "blurb": "The Nexitel dealer/reseller program: a way for shops, entrepreneurs and side-hustlers to earn recurring income by selling and activating Nexitel prepaid SIMs and plans. Low barrier to entry, real margins, support provided.",
+      "url": "https://nexitel.us",
+      "cta": "Become a dealer · nexitel.us",
+      "colors": { "ink": "#0f0a2e", "ink2": "#241552", "accent": "#a78bfa", "accent2": "#3b82f6", "accentText": "#ddd6fe" },
+      "logo": "nexitel.png"
+    },
+    {
+      "key": "nexivolt",
+      "name": "Nexivolt",
+      "category": "Telecom Dealer Platform",
+      "tagline": "Multi-carrier SIM activation & recharge, one portal",
+      "blurb": "A multi-carrier SIM activation and recharge dealer portal. Lets telecom dealers manage activations and top-ups across multiple carriers from a single dashboard, with admin/dealer/team roles. The operating system for a modern telecom dealership.",
+      "url": "https://nexivolt.us",
+      "cta": "nexivolt.us",
+      "colors": { "ink": "#0b1220", "ink2": "#0f1b2e", "accent": "#22d3ee", "accent2": "#38bdf8", "accentText": "#a5f3fc" },
+      "logo": "nexivolt.png"
+    },
+    {
+      "key": "onetapalert",
+      "name": "One Tap Alert",
+      "category": "Personal Safety App",
+      "tagline": "One tap. Help is on the way.",
+      "blurb": "A personal-safety SOS app for iPhone and Android. One-tap SOS alerts your emergency contacts with live location, a Safety Timer that auto-alerts if you don't check in, real-time location sharing, and an encrypted vault for IDs/medical info. Privacy-first: no background tracking, no data selling.",
+      "url": "https://onetapalert.com",
+      "cta": "iOS & Android · onetapalert.com",
+      "colors": { "ink": "#1A2E1A", "ink2": "#2D5A3D", "accent": "#4A7C59", "accent2": "#6fae7f", "accentText": "#cdebd5" },
+      "logo": "onetapalert.png"
+    },
+    {
+      "key": "pawmance",
+      "name": "Pawmance",
+      "category": "Pet Matchmaking App",
+      "tagline": "Find your pet's perfect match",
+      "blurb": "A health-verified pet socialization and matchmaking platform — owners find compatible, vetted playmates and companions for their dogs, cats, rabbits, horses and other animals, then arrange safe playdates. It is about friendship and play, not breeding.",
+      "url": "https://pawmance.us",
+      "cta": "pawmance.us",
+      "colors": { "ink": "#2a1a2e", "ink2": "#3d2742", "accent": "#f7c8e0", "accent2": "#e0c3fc", "accentText": "#f7c8e0" },
+      "logo": "pawmance.png"
+    },
+    {
+      "key": "frienda",
+      "name": "Friend-A",
+      "category": "Companionship Marketplace",
+      "tagline": "Meet real friends — or earn as one",
+      "blurb": "A two-sided platonic friendship and companionship marketplace. Members meet verified people nearby for activity partners and genuine friendship; providers earn money offering paid platonic companionship for events, dining, sightseeing and hobbies. Strictly platonic — never dating or romance.",
+      "url": "https://friend-a.com",
+      "cta": "friend-a.com",
+      "colors": { "ink": "#1d2433", "ink2": "#26304a", "accent": "#ff7a59", "accent2": "#ffa07a", "accentText": "#ffd9cc" },
+      "logo": "frienda.png"
+    }
+  ]
+}

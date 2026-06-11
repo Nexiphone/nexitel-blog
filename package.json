@@ -14,7 +14,8 @@
     "post:li-blog": "node scripts/post-blog-to-linkedin.mjs",
     "post:li-promo": "node scripts/post-promo-to-linkedin.mjs",
     "social:post": "node scripts/generate-social-post.mjs",
-    "poster:generate": "node scripts/generate-poster.mjs"
+    "poster:generate": "node scripts/generate-poster.mjs",
+    "founder:post": "node scripts/generate-founder-post.mjs"
   },
   "dependencies": {
     "next": "14.2.15",
