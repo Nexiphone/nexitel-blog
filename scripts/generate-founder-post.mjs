@@ -90,30 +90,34 @@ async function writeCopy(project) {
   const system =
     `You ghost-write LinkedIn posts in the authentic first-person voice of ${FOUNDER}, ${FOUNDER_TITLE} — ` +
     "a hands-on founder building a portfolio of consumer and B2B ventures (telecom, safety, social apps). " +
-    "Voice: confident but human, reflective, plain-spoken, founder-to-founder. No hype, no buzzword soup, " +
-    "no emoji spam (one tasteful emoji at most, usually none). Short punchy lines and line breaks like a real " +
-    "LinkedIn post. Lead with a hook or a belief, tell it through the lens of WHY this product matters to real " +
-    "people, end with a light reflection or a question to the reader. You ALWAYS reply with one JSON object only.";
+    "STYLE = FOUNDER INSIGHT / THOUGHT LEADERSHIP, not promotion. Each post is primarily a LESSON, BELIEF, " +
+    "or REFLECTION from actually building — and the specific venture is just the concrete EXAMPLE that " +
+    "illustrates the idea, never the subject of a pitch. The reader should walk away having learned or " +
+    "reconsidered something, not feeling sold to. Voice: confident but humble, plain-spoken, founder-to-" +
+    "founder, a little contrarian. No hype, no buzzword soup, no feature lists, no 'check it out', no emoji " +
+    "spam (usually zero emoji). Short punchy lines with line breaks like a real LinkedIn post. " +
+    "You ALWAYS reply with one JSON object only.";
 
-  const prompt = `Write ONE first-person LinkedIn post by ${FOUNDER} about this venture.
+  const prompt = `Write ONE first-person LinkedIn post by ${FOUNDER} in a FOUNDER-INSIGHT / thought-leadership style.
 
-Venture: ${project.name} (${project.category})
-What it is: ${project.blurb}
-One-liner: ${project.tagline}
-Link: ${project.url}
+The post is mainly a LESSON, BELIEF, or REFLECTION from building. Use this venture only as the concrete EXAMPLE that proves the point — do NOT pitch it.
+
+Venture (the example): ${project.name} (${project.category})
+What it is (context for you): ${project.blurb}
+The deeper theme it touches: ${project.tagline}
 
 Requirements:
-- First person ("I", "we built", "at NEXI Corp"). Sound like the founder, not a brand account.
-- 4-9 short lines/paragraphs with line breaks, LinkedIn-native. ~120-200 words.
-- Open with a strong hook (a belief, a problem, a moment) — NOT "Excited to announce".
-- Make the reader feel why ${project.name} matters to real people.
-- Do NOT put the URL in the body (it's added separately). No more than 3 hashtags, placed at the very end.
-- End with a brief reflection or a question to other builders.
+- Lead with an insight, a hard-won lesson, a contrarian belief, or a specific moment from building.
+- Teach the reader something or make them think. ${project.name} appears as evidence/illustration, mentioned naturally once or twice — NOT promoted. If a sentence sounds like an ad, rewrite it.
+- NO feature lists, NO "sign up / check out / download", NO marketing adjectives.
+- First person ("I", "we", "at NEXI Corp"). 4-9 short lines, ~120-200 words, LinkedIn-native line breaks.
+- Do NOT put the URL in the body (it's added separately). At most 2 hashtags at the very end, or none.
+- End with a genuine reflection or a question to other builders/operators.
 
 Return ONLY a JSON object with EXACTLY:
 {
-  "headline": "a punchy 3-7 word phrase for the poster graphic, Title Case, no period",
-  "commentary": "the full LinkedIn post text (with line breaks, hashtags at the end)"
+  "headline": "the core INSIGHT as a punchy 3-7 word phrase for the poster (a belief/lesson, NOT a product tagline), Title Case, no period",
+  "commentary": "the full LinkedIn post text (with line breaks, optional hashtags at the end)"
 }`;
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -269,7 +273,9 @@ async function main() {
   const png = await renderPoster(project, copy.headline, logoUri);
   console.log(`Rendered poster (${Math.round(png.length / 1024)} KB).`);
 
-  const fullText = `${copy.commentary}\n\n${project.cta && !copy.commentary.includes(project.url) ? project.url : ""}`.trim();
+  // Founder-insight style: let the post stand on its own (the poster carries the
+  // brand + URL). LinkedIn also down-ranks posts with external links in the body.
+  const fullText = copy.commentary.trim();
   console.log(`\n--- post ---\n${fullText}\n------------\n`);
 
   if (dryRun) {
