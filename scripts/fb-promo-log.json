@@ -1,10 +1,12 @@
 {
-  "next_locale": "zh",
+  "next_locale": "es",
   "history": {
     "en": {
       "15-dollar-plan": "2026-06-11T01:21:19.000Z"
     },
-    "zh": {},
+    "zh": {
+      "15-dollar-plan": "2026-06-11T23:07:46.251Z"
+    },
     "es": {}
   }
 }
