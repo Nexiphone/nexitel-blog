@@ -179,11 +179,39 @@ async function postToFacebook(token, pageId, imageUrl, message) {
   return data.post_id || data.id;
 }
 
+async function igWaitReady(token, creationId) {
+  // Poll the container until Instagram finishes processing the image, so
+  // media_publish doesn't 400 with "Media ID is not available".
+  for (let i = 0; i < 12; i++) {
+    const res = await fetch(
+      `https://graph.facebook.com/${graphVersion}/${creationId}?fields=status_code&access_token=${encodeURIComponent(token)}`,
+    );
+    const data = await res.json().catch(() => ({}));
+    if (data.status_code === "FINISHED") return;
+    if (data.status_code === "ERROR" || data.status_code === "EXPIRED") {
+      throw new Error(`Instagram container ${data.status_code}`);
+    }
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+}
+
 async function postToInstagram(token, igUserId, imageUrl, caption) {
   const container = await graph(`${igUserId}/media`, { image_url: imageUrl, caption, access_token: token });
   if (!container.id) throw new Error("Instagram: no creation id returned.");
-  const published = await graph(`${igUserId}/media_publish`, { creation_id: container.id, access_token: token });
-  return published.id;
+  await igWaitReady(token, container.id);
+  // Publish, retrying briefly if the container is still settling.
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const published = await graph(`${igUserId}/media_publish`, { creation_id: container.id, access_token: token });
+      return published.id;
+    } catch (e) {
+      if (attempt < 3 && /not available|Media ID|not ready/i.test(e.message)) {
+        await new Promise((r) => setTimeout(r, 5000));
+        continue;
+      }
+      throw e;
+    }
+  }
 }
 
 /**
