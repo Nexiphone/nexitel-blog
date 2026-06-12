@@ -46,22 +46,42 @@ const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
 const ACCENT = "#c4b5fd"; // light purple for accents
 
-// Rotating topic pillars so daily tips stay varied across themes.
+// Rotating topic pillars so daily tips stay varied across themes. Deliberately
+// broad — coverage, eSIM, setup, travel, audiences, use-cases, security — with
+// only a minority about price, so posts don't all read as "save money".
 const PILLARS = [
-  "how much money you can save switching from a big carrier to prepaid",
+  // coverage / network
   "what to check before buying a prepaid SIM (coverage, network, data)",
+  "how to tell if a carrier has solid 5G coverage where you live",
+  // eSIM / setup
   "eSIM vs physical SIM — which to pick and why",
+  "how an eSIM works and how to set one up in minutes",
+  "how to activate a new prepaid plan, step by step",
+  // switching / number
   "how to keep your phone number when switching carriers",
-  "picking the right amount of data so you never overpay",
-  "best prepaid setup for a family on one bill",
-  "staying connected affordably while traveling in the USA",
-  "why unlimited talk & text doesn't have to be expensive",
-  "hidden fees on phone bills and how prepaid avoids them",
-  "a quick win for new immigrants getting their first US SIM",
-  "dual-SIM tips for work + personal on one phone",
-  "how to activate a new prepaid plan in minutes",
-  "best prepaid plan for heavy streamers / gamers",
-  "data-only plans for tablets, hotspots and IoT devices",
+  "what 'no contract' really means and the freedom it gives you",
+  "switching carriers with no credit check, explained",
+  // travel
+  "staying connected on a US road trip",
+  "phone plan tips for travelers visiting or moving to the USA",
+  "the best setup for snowbirds and part-time residents",
+  // audiences
+  "the best prepaid setup for a family on one bill",
+  "choosing a first phone plan for a teenager",
+  "a simple, no-fuss plan for seniors",
+  "the right plan for new immigrants getting their first US SIM",
+  "staying connected affordably as a student",
+  // use cases
+  "dual-SIM tips for keeping work and personal on one phone",
+  "data tips for remote workers and gig drivers",
+  "what heavy streamers and gamers should look for in a plan",
+  "data-only plans for tablets, hotspots and smart devices",
+  // security / practical
+  "simple ways to protect your number from SIM-swap scams",
+  "how to check your data usage and avoid surprises",
+  // value (kept as a minority)
+  "how to pick the right amount of data so you never overpay",
+  "how prepaid avoids the hidden fees on a typical phone bill",
 ];
 
 function extractJson(text) {
@@ -82,12 +102,12 @@ async function loadHistory() {
 }
 
 const MOCK_CONTENT = {
-  category: "Money Tip",
-  headline: "Cut Your Phone Bill in Half",
-  tip: "Most prepaid plans give you the same 5G towers as the big carriers — for a fraction of the price. No contract, no credit check.",
-  imageQuery: "person using smartphone city",
-  caption: "Why pay more for the same network? Switch to prepaid and keep the savings.",
-  hashtags: ["#Nexitel", "#PrepaidWireless", "#PhonePlans", "#5G", "#USA"],
+  category: "eSIM 101",
+  headline: "Set Up an eSIM in 5 Minutes",
+  tip: "No store, no waiting for a SIM in the mail. Scan a QR code and your new line is live on the same phone in minutes — keep your old number too.",
+  imageQuery: "person setting up phone esim",
+  caption: "Switching lines used to mean a trip to the store. With eSIM, it's a QR scan and you're done.",
+  hashtags: ["#Nexitel", "#eSIM", "#PrepaidWireless", "#5G", "#USA"],
 };
 
 async function writeContent(history) {
@@ -106,20 +126,23 @@ async function writeContent(history) {
     "You write punchy, helpful social media graphics for Nexitel (nexitel.us) — an " +
     "affordable prepaid wireless / SIM service in the USA with no contracts: cheap " +
     "unlimited talk & text, nationwide 5G on major networks, eSIM and physical SIM, easy " +
-    "number transfer, and plans for families, travelers, immigrants and budget users. Tone " +
-    "is clear, upbeat, money-saving and genuinely useful. You ALWAYS respond with a single " +
-    "valid JSON object and nothing else.";
+    "number transfer, and plans for families, travelers, immigrants, students, seniors and " +
+    "everyday users. Tone is clear, upbeat, practical and genuinely useful. IMPORTANT: do " +
+    "NOT make every post about saving money — only occasionally lead with price. Most posts " +
+    "should be genuinely useful tips about coverage, eSIM, setup, travel, a specific audience, " +
+    "a use-case, or staying connected. You ALWAYS respond with a single valid JSON object and " +
+    "nothing else.";
 
   const prompt = `Create the text for ONE daily Nexitel poster (a designed graphic with a short tip).
 
-Theme for today: "${pillar}". Pick a fresh, specific angle.
+Theme for today: "${pillar}". Stay on THIS theme — don't drift back to a generic "save money" message unless the theme itself is about price. Pick a fresh, specific angle.
 
 Do NOT repeat or closely overlap any of these recent headlines:
 ${recent}
 
 Return ONLY a JSON object with EXACTLY these fields:
 {
-  "category": "2-3 word kicker in Title Case, e.g. 'Money Tip', 'Did You Know?', 'Wireless 101', 'Save More'",
+  "category": "2-3 word kicker in Title Case that fits the theme, e.g. 'Wireless 101', 'eSIM 101', 'Travel Tip', 'Coverage', 'Did You Know?', 'For Families', 'Switch Smart', 'Stay Safe' (use 'Money Tip' only for price themes)",
   "headline": "punchy hook, MAX 38 characters, Title Case, no period",
   "tip": "1-2 helpful sentences expanding the headline, MAX 170 characters",
   "imageQuery": "2-3 word search term for a REAL photo, e.g. 'person using smartphone', 'family phones', 'travel airport phone', 'city 5g'",
