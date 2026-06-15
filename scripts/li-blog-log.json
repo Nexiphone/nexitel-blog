@@ -1,5 +1,5 @@
 {
-  "next_locale": "es",
+  "next_locale": "en",
   "posted": {
     "en": [
       "5g-coverage-guide-2026",
@@ -10,7 +10,8 @@
       "why-no-contract-plans-are-better"
     ],
     "es": [
-      "5g-coverage-guide-2026"
+      "5g-coverage-guide-2026",
+      "why-no-contract-plans-are-better"
     ]
   }
 }
