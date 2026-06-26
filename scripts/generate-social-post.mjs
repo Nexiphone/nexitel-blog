@@ -241,34 +241,33 @@ async function resolvePageToken(token, pageId) {
  * each daily share looks different and on-topic. The public CDN URL is passed
  * straight to Meta as image_url (square crop, valid for Instagram).
  */
+// Curated, diverse photos — real people, families, friends, travel and
+// connection. Deliberately NO blank phone-on-desk mockups (those looked
+// generic and kept repeating). Interleaved so consecutive days alternate
+// between people / travel / lifestyle.
 const PHOTO_LIBRARY = [
-  { id: "photo-1511707171634-5f897ff02aa9", tags: ["phone", "apps", "device", "esim", "activation", "setup"] },
-  { id: "photo-1512941937669-90a1b58e7e9c", tags: ["phone", "apps", "device", "esim"] },
-  { id: "photo-1556656793-08538906a9f8", tags: ["phone", "device", "sim", "esim", "plan", "switch"] },
-  { id: "photo-1530319067432-f2a729c03db5", tags: ["phone", "activation", "new", "esim", "setup", "immigrant"] },
-  { id: "photo-1516321318423-f06f85e504b3", tags: ["phone", "online", "digital", "data"] },
-  { id: "photo-1522125670776-3c7abb882bc2", tags: ["phone", "using", "lifestyle", "data", "stream", "text", "talk"] },
-  { id: "photo-1601972602237-8c79241e468b", tags: ["phone", "app", "city", "using", "data", "stream"] },
-  { id: "photo-1565849904461-04a58ad377e0", tags: ["phone", "camera", "outdoor", "travel", "content", "game", "stream"] },
-  { id: "photo-1436491865332-7a61a109cc05", tags: ["airport", "travel", "international", "roam", "nomad", "trip"] },
-  { id: "photo-1469854523086-cc02fe5d8800", tags: ["car", "road", "roadtrip", "travel", "drive", "trip"] },
-  { id: "photo-1507525428034-b723cf961d3e", tags: ["beach", "travel", "vacation", "outdoor", "snowbird"] },
-  { id: "photo-1551632811-561732d1e306", tags: ["hike", "trail", "travel", "outdoor", "adventure", "coverage"] },
-  { id: "photo-1519608487953-e999c86e7455", tags: ["city", "people", "coverage", "urban"] },
-  { id: "photo-1502920917128-1aa500764cbd", tags: ["city", "commute", "street", "coverage"] },
-  { id: "photo-1494790108377-be9c29b29330", tags: ["person", "people", "family", "couple", "teen"] },
-  { id: "photo-1521737711867-e3b97375f902", tags: ["remote", "work", "laptop", "team", "nomad", "gig", "business", "family"] },
+  "photo-1543269865-cbf427effbad", // friends collaborating on laptops
+  "photo-1522125670776-3c7abb882bc2", // hands using a phone
+  "photo-1502685104226-ee32379fefbe", // woman on a call outdoors
+  "photo-1436491865332-7a61a109cc05", // airplane wing over clouds (travel)
+  "photo-1601972602237-8c79241e468b", // phone in hand, colourful city
+  "photo-1469854523086-cc02fe5d8800", // van on an open road (road trip)
+  "photo-1488521787991-ed7bbaae773c", // family piled together, smiling
+  "photo-1565849904461-04a58ad377e0", // phone in hand, outdoors
+  "photo-1507525428034-b723cf961d3e", // beach (vacation / snowbird)
+  "photo-1529156069898-49953e39b3ac", // friends watching the sunset
+  "photo-1519608487953-e999c86e7455", // city street, people
+  "photo-1556742502-ec7c0e9f34b1", // friends hugging, one holding a phone
+  "photo-1551632811-561732d1e306", // hiker on a trail (coverage anywhere)
+  "photo-1494790108377-be9c29b29330", // smiling woman portrait
+  "photo-1521737711867-e3b97375f902", // team working on laptops
 ];
 
-function pickPhotoId(text, salt) {
-  const hay = (text || "").toLowerCase();
-  let best = null, bestScore = -1;
-  PHOTO_LIBRARY.forEach((p, i) => {
-    let score = p.tags.reduce((s, t) => (hay.includes(t) ? s + 1 : s), 0);
-    score += ((i + salt) % PHOTO_LIBRARY.length) / 100; // rotation tiebreak
-    if (score > bestScore) { bestScore = score; best = p.id; }
-  });
-  return best || PHOTO_LIBRARY[salt % PHOTO_LIBRARY.length].id;
+// Rotate strictly by day so images cycle through the whole library and never
+// repeat back-to-back (full cycle = PHOTO_LIBRARY.length days).
+function pickPhotoId(salt) {
+  const n = PHOTO_LIBRARY.length;
+  return PHOTO_LIBRARY[(((salt % n) + n) % n)];
 }
 
 const photoUrl = (id) => `https://images.unsplash.com/${id}?w=1080&h=1080&fit=crop&q=80`;
@@ -278,7 +277,7 @@ async function main() {
   // Use a varied, on-topic photo instead of the (often reused) blog cover.
   const now = new Date();
   const salt = now.getUTCFullYear() * 1000 + Math.floor((now - Date.UTC(now.getUTCFullYear(), 0, 0)) / 86400000);
-  const photoId = pickPhotoId(`${post.title} ${post.category} ${post.excerpt}`, salt);
+  const photoId = pickPhotoId(salt);
   const imageUrl = photoUrl(photoId);
 
   const { full, articleUrl } = await writeCaption(post);
