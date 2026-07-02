@@ -44,5 +44,18 @@ jobs:
             echo "No new posts to commit."
           else
             git commit -m "add: 2 daily blog posts in EN/ZH/ES for $(date -u +%Y-%m-%d)"
-            git push
+            # Rebase our new posts on top of anything that landed during the run,
+            # then retry the push against concurrent daily jobs + Vercel pushing to main.
+            git pull --rebase --autostash origin main
+            for attempt in 1 2 3 4 5; do
+              if git push origin main; then
+                echo "Push succeeded on attempt $attempt."
+                exit 0
+              fi
+              echo "Push attempt $attempt failed; rebasing on latest main and retrying..."
+              sleep 5
+              git pull --rebase --autostash origin main
+            done
+            echo "Push failed after 5 attempts."
+            exit 1
           fi
