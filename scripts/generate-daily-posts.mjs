@@ -14,6 +14,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { readdirSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { publishPostToDb } from "./lib/publish-db.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -208,12 +209,27 @@ async function main() {
   console.log("Generated topics:", topics.map((t) => t.slug));
 
   for (const topic of topics) {
+    // Collect each locale's MDX so we can mirror the post to the DB after the
+    // files are on disk.
+    const perLocale = {};
     for (const locale of ["en", "zh", "es"]) {
       console.log(`Writing ${locale}/${topic.slug}.mdx`);
       const content = await generatePost(topic, locale);
       const dir = join(POSTS_DIR, locale);
       if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
       writeFileSync(join(dir, `${topic.slug}.mdx`), content + "\n", "utf8");
+      perLocale[locale] = content;
+    }
+
+    // Files are written (the source of truth). Now mirror to Supabase.
+    // A DB failure must NEVER break the .mdx/git flow — log and continue.
+    try {
+      await publishPostToDb(topic.slug, perLocale);
+    } catch (err) {
+      console.error(
+        `DB publish failed for ${topic.slug} (continuing):`,
+        err?.message ?? err,
+      );
     }
   }
 
