@@ -19,6 +19,35 @@ import { publishPostToDb } from "./lib/publish-db.mjs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const POSTS_DIR = join(ROOT, "posts");
+const IMAGES_DIR = join(ROOT, "public", "images", "blog");
+
+/**
+ * Fetch a unique, on-topic landscape photo from Pexels and save it as
+ * <slug>.jpg, returning the public path. Returns null if no key / no result /
+ * any failure, so the caller can fall back to the static image pool.
+ */
+async function fetchAndSaveImage(slug, query) {
+  const key = process.env.PEXELS_API_KEY;
+  if (!key || !query) return null;
+  try {
+    const res = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=15&orientation=landscape`,
+      { headers: { Authorization: key } },
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const photo = Array.isArray(data.photos) ? data.photos[0] : null;
+    const src = photo?.src?.landscape || photo?.src?.large2x || photo?.src?.large;
+    if (!src) return null;
+    const imgRes = await fetch(src);
+    if (!imgRes.ok) return null;
+    if (!existsSync(IMAGES_DIR)) mkdirSync(IMAGES_DIR, { recursive: true });
+    writeFileSync(join(IMAGES_DIR, `${slug}.jpg`), Buffer.from(await imgRes.arrayBuffer()));
+    return `/images/blog/${slug}.jpg`;
+  } catch {
+    return null;
+  }
+}
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 if (!apiKey) {
@@ -137,14 +166,16 @@ Return ONLY a JSON array (no markdown, no commentary) like this:
     "description": "SEO meta description, 150-160 chars",
     "category": "Guide" | "Plans" | "Technology" | "Travel",
     "image": "filename-from-list.jpg",
+    "photoQuery": "2-4 word stock-photo search query",
     "targetCountry": "India" | "China" | "Taiwan" | "UAE" | "Egypt"
   },
   { ... }
 ]
 
-Available images: ${AVAILABLE_IMAGES.join(", ")}
-Pick TWO DIFFERENT images for the two posts.
-Pick TWO DIFFERENT target countries for the two posts.`;
+"photoQuery" must describe the post's main HUMAN SUBJECT or scenario as a photographer would shoot it (e.g. "indian student campus", "warehouse worker scanning", "family video call"). NEVER use abstract telecom words like "prepaid", "plan", "SIM", "5G", "coverage" — those don't photograph well. It drives a real, unique cover photo per post.
+
+"image" is only a fallback if the photo fetch fails — pick from: ${AVAILABLE_IMAGES.join(", ")}
+Pick TWO DIFFERENT images and TWO DIFFERENT target countries for the two posts.`;
 
 async function generateTopics() {
   const message = await client.messages.create({
@@ -209,12 +240,21 @@ async function main() {
   console.log("Generated topics:", topics.map((t) => t.slug));
 
   for (const topic of topics) {
+    // Fetch a unique, on-topic cover photo. Fall back to the static pool if the
+    // Pexels fetch is unavailable or fails.
+    const fetched = await fetchAndSaveImage(topic.slug, topic.photoQuery || topic.title);
+    const imagePath = fetched || `/images/blog/${topic.image}`;
+    console.log(`Image for ${topic.slug}: ${imagePath}${fetched ? " (Pexels)" : " (fallback)"}`);
+
     // Collect each locale's MDX so we can mirror the post to the DB after the
     // files are on disk.
     const perLocale = {};
     for (const locale of ["en", "zh", "es"]) {
       console.log(`Writing ${locale}/${topic.slug}.mdx`);
-      const content = await generatePost(topic, locale);
+      let content = await generatePost(topic, locale);
+      // Force the frontmatter image to the resolved path so every locale shares
+      // the same cover and the LLM can't drift from the chosen photo.
+      content = content.replace(/^image:\s*.*$/m, `image: "${imagePath}"`);
       const dir = join(POSTS_DIR, locale);
       if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
       writeFileSync(join(dir, `${topic.slug}.mdx`), content + "\n", "utf8");

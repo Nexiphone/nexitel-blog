@@ -1,20 +1,29 @@
-name: Daily blog posts
+name: Backfill post images
 
+# Manual only. Replaces the heavily-reused static cover images with a unique,
+# on-topic Pexels photo per post. Run with a small `limit` first to spot-check
+# quality, then run again with no limit for the full set.
 on:
-  # 13:31 UTC ~ 9:31 AM Eastern. Off-the-hour to avoid the cron stampede.
-  schedule:
-    - cron: '31 13 * * *'
   workflow_dispatch:
+    inputs:
+      limit:
+        description: "Max number of posts to process (blank = all)"
+        type: string
+        default: ""
+      force:
+        description: "Refetch even if an image already exists for the slug"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
 concurrency:
-  group: daily-blog-posts
+  group: backfill-post-images
   cancel-in-progress: false
 
 jobs:
-  generate:
+  backfill:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,25 +37,27 @@ jobs:
           npm install --no-audit --no-fund
           npm install --no-save @anthropic-ai/sdk
 
-      - name: Generate daily blog posts
+      - name: Backfill cover images
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: node scripts/generate-daily-posts.mjs
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.limit }}" ]; then ARGS="$ARGS --limit=${{ inputs.limit }}"; fi
+          if [ "${{ inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
+          node scripts/backfill-post-images.mjs $ARGS
 
-      - name: Commit and push new posts
+      - name: Commit and push updated images
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add posts/ public/images/blog/
           if git diff --cached --quiet; then
-            echo "No new posts to commit."
+            echo "No image changes to commit."
           else
-            git commit -m "add: 2 daily blog posts in EN/ZH/ES for $(date -u +%Y-%m-%d)"
-            # Rebase our new posts on top of anything that landed during the run,
-            # then retry the push against concurrent daily jobs + Vercel pushing to main.
+            git commit -m "content: unique on-topic cover images ($(date -u +%Y-%m-%d))"
+            # Rebase onto anything that landed during the run, then retry the push
+            # against concurrent daily jobs + Vercel pushing to main.
             git pull --rebase --autostash origin main
             for attempt in 1 2 3 4 5; do
               if git push origin main; then
