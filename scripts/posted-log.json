@@ -71,7 +71,8 @@
       "prepaid-plan-farmers-rural-coverage-2026",
       "prepaid-plan-healthcare-workers-nurses-2026",
       "prepaid-plan-photographers-content-uploads-2026",
-      "prepaid-plan-teachers-educators-2026"
+      "prepaid-plan-teachers-educators-2026",
+      "prepaid-plan-pet-owners-vet-emergencies-2026"
     ],
     "zh": [
       "5g-coverage-guide-2026",
@@ -144,7 +145,8 @@
       "prepaid-plan-healthcare-workers-nurses-2026",
       "prepaid-plan-photographers-content-uploads-2026",
       "prepaid-plan-teachers-educators-2026",
-      "prepaid-plan-pet-owners-vet-emergencies-2026"
+      "prepaid-plan-pet-owners-vet-emergencies-2026",
+      "prepaid-plan-real-estate-agents-2026"
     ],
     "es": [
       "5g-coverage-guide-2026",
@@ -217,7 +219,8 @@
       "prepaid-plan-healthcare-workers-nurses-2026",
       "prepaid-plan-photographers-content-uploads-2026",
       "prepaid-plan-teachers-educators-2026",
-      "prepaid-plan-pet-owners-vet-emergencies-2026"
+      "prepaid-plan-pet-owners-vet-emergencies-2026",
+      "prepaid-plan-real-estate-agents-2026"
     ]
   }
 }
