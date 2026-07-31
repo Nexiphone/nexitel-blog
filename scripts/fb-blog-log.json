@@ -1,5 +1,5 @@
 {
-  "next_locale": "es",
+  "next_locale": "en",
   "posted": {
     "en": [
       "5g-coverage-guide-2026",
@@ -52,7 +52,8 @@
       "tmobile-5g-prepaid-plans-2026",
       "how-to-switch-from-contract-to-prepaid",
       "prepaid-plans-for-seniors-2026",
-      "wifi-calling-explained-how-it-works"
+      "wifi-calling-explained-how-it-works",
+      "data-only-plans-iot-devices-2026"
     ]
   }
 }
