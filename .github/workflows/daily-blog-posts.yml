@@ -1,9 +1,14 @@
 name: Daily blog posts
 
 on:
+  # DISABLED 2026-08-10: daily post generation stopped by request.
+  # Also disabled server-side via `gh workflow disable "Daily blog posts"`.
+  # To re-enable: uncomment the schedule below AND run
+  #   gh workflow enable "Daily blog posts"
+  #
   # 13:31 UTC ~ 9:31 AM Eastern. Off-the-hour to avoid the cron stampede.
-  schedule:
-    - cron: '31 13 * * *'
+  # schedule:
+  #   - cron: '31 13 * * *'
   workflow_dispatch:
 
 permissions:

@@ -60,11 +60,11 @@ console.log(`Found ${existingSlugs.length} existing posts.`);
 const SYSTEM_PROMPT = `You are an SEO content writer for Nexitel, a US prepaid wireless carrier targeting specific international audiences.
 
 Nexitel offers:
-- Nexitel Blue Plans — AT&T network, from $10/mo. Link: https://nexitel.us/blue-plans
-- Nexitel Purple Plans — T-Mobile network, from $6/mo. Link: https://nexitel.us/purple-plans
-- All plans page: https://nexitel.us/plans
-- NexiTalk VoIP — international calling from $4.99/mo. Link: https://nexitel.us/nexi-talk
-- Nexi Volt — global mobile recharge/top-up service. Link: https://nexitel.us/nexi-volt
+- Nexitel Blue Plans — AT&T network, from $10/mo. Link: https://www.nexitel.us/plans
+- Nexitel Purple Plans — T-Mobile network, from $6/mo. Link: https://www.nexitel.us/plans
+- All plans page: https://www.nexitel.us/plans
+- NexiTalk VoIP — international calling from $4.99/mo. Link: https://www.nexitel.us/nexitalk
+- Nexi Volt — global mobile recharge/top-up service. Mention by name only, do NOT link it.
 
 TARGET AUDIENCES (PRIORITY ORDER):
 1. 🇮🇳 INDIANS — students on F-1 visa, H1B workers, tourists, immigrants, families connecting between USA & India. Mention Jio/Airtel/Vi top-ups, calls to India, USIE/H1B/L1 situations.
@@ -81,7 +81,7 @@ Write helpful, informative posts that solve REAL problems these audiences face. 
 - Start with an H2 heading (NOT H1)
 - Use H2/H3 for structure
 - Include bullet points and numbered lists
-- Link to nexitel.us/plans, nexitel.us/blue-plans, nexitel.us/purple-plans, nexi-talk, nexi-volt
+- Link to https://www.nexitel.us/plans and https://www.nexitel.us/nexitalk (these are the only valid link targets — never invent other paths)
 - End with a strong CTA
 - NOT include any "Contact Us" section (handled by the layout)
 - Be informative and helpful, not salesy`;
@@ -188,7 +188,7 @@ author: "${authors[locale]}"
 image: "/images/blog/${topic.image}"
 ---
 
-Then the body: ~80-110 lines of markdown, starting with H2. Use H2/H3, bullets, numbered lists. Link to nexitel.us/plans, nexitel.us/blue-plans, nexitel.us/purple-plans. Mention NexiTalk and Nexi Volt where relevant. End with a strong CTA. No "Contact Us" section.
+Then the body: ~80-110 lines of markdown, starting with H2. Use H2/H3, bullets, numbered lists. Link to https://www.nexitel.us/plans and https://www.nexitel.us/nexitalk only. Mention NexiTalk and Nexi Volt by name where relevant, but do not link Nexi Volt. End with a strong CTA. No "Contact Us" section.
 
 Output ONLY the file content, nothing else.`;
 

@@ -83,7 +83,7 @@ export default function LocaleLayout({ children, params }: Props) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center space-x-8">
-              <a href="https://nexitel.us" className="flex items-center space-x-2">
+              <a href="https://www.nexitel.us" className="flex items-center space-x-2">
                 <span className="text-2xl font-extrabold gradient-text" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   Nexitel
                 </span>
@@ -116,13 +116,13 @@ export default function LocaleLayout({ children, params }: Props) {
               </div>
 
               <a
-                href="https://nexitel.us"
+                href="https://www.nexitel.us"
                 className="hidden sm:inline text-white/60 hover:text-white text-sm transition-colors"
               >
                 {t.nav.backToNexitel} &rarr;
               </a>
               <a
-                href="https://nexitel.us/blue-plans"
+                href="https://www.nexitel.us/plans"
                 className="btn-vibrant text-xs sm:text-sm"
               >
                 {t.nav.viewPlans}
@@ -147,7 +147,7 @@ export default function LocaleLayout({ children, params }: Props) {
               <span className="gradient-text">{t.cta.title}</span>
             </h2>
             <p className="text-white/50 mb-6 max-w-lg mx-auto">{t.cta.description}</p>
-            <a href="https://nexitel.us/blue-plans" className="btn-vibrant">
+            <a href="https://www.nexitel.us/plans" className="btn-vibrant">
               {t.cta.browseAllPlans}
             </a>
           </div>
@@ -168,9 +168,9 @@ export default function LocaleLayout({ children, params }: Props) {
             <div>
               <h3 className="text-white font-bold mb-4 text-xs uppercase tracking-widest" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{t.footer.quickLinks}</h3>
               <ul className="space-y-2.5 text-sm">
-                <li><a href="https://nexitel.us/blue-plans" className="text-white/40 hover:text-white transition-colors">{t.footer.plans}</a></li>
-                <li><a href="https://nexitel.us/purple-plans" className="text-white/40 hover:text-white transition-colors">{t.footer.purplePlans}</a></li>
-                <li><a href="https://nexitel.us/data-plans" className="text-white/40 hover:text-white transition-colors">{t.footer.dataPlans}</a></li>
+                <li><a href="https://www.nexitel.us/plans" className="text-white/40 hover:text-white transition-colors">{t.footer.plans}</a></li>
+                <li><a href="https://www.nexitel.us/plans" className="text-white/40 hover:text-white transition-colors">{t.footer.purplePlans}</a></li>
+                <li><a href="https://www.nexitel.us/plans" className="text-white/40 hover:text-white transition-colors">{t.footer.dataPlans}</a></li>
                 <li><Link href={`/${locale}`} className="text-white/40 hover:text-white transition-colors">{t.footer.blog}</Link></li>
               </ul>
             </div>
@@ -179,10 +179,10 @@ export default function LocaleLayout({ children, params }: Props) {
             <div>
               <h3 className="text-white font-bold mb-4 text-xs uppercase tracking-widest" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{t.footer.support}</h3>
               <ul className="space-y-2.5 text-sm">
-                <li><a href="https://nexitel.us/support" className="text-white/40 hover:text-white transition-colors">{t.footer.helpCenter}</a></li>
-                <li><a href="https://nexitel.us/support" className="text-white/40 hover:text-white transition-colors">{t.footer.contactUs}</a></li>
-                <li><a href="https://nexitel.us/wholesale" className="text-white/40 hover:text-white transition-colors">{t.footer.wholesale}</a></li>
-                <li><a href="https://nexitel.us/compare" className="text-white/40 hover:text-white transition-colors">{t.footer.comparePlans}</a></li>
+                <li><a href="https://www.nexitel.us/support" className="text-white/40 hover:text-white transition-colors">{t.footer.helpCenter}</a></li>
+                <li><a href="https://www.nexitel.us/support" className="text-white/40 hover:text-white transition-colors">{t.footer.contactUs}</a></li>
+                <li><a href="https://nexivolt.us" className="text-white/40 hover:text-white transition-colors">{t.footer.wholesale}</a></li>
+                <li><a href="https://www.nexitel.us/plans" className="text-white/40 hover:text-white transition-colors">{t.footer.comparePlans}</a></li>
               </ul>
             </div>
           </div>

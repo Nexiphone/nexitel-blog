@@ -287,7 +287,7 @@ export default function BlogPostPage({ params }: Props) {
                     {t.cta.checkOutPlans}
                   </p>
                   <a
-                    href="https://nexitel.us/blue-plans"
+                    href="https://www.nexitel.us/plans"
                     className="block text-center bg-nexitel-gradient text-white text-sm font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
                     target="_blank"
                     rel="noopener noreferrer"
