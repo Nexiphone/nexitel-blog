@@ -1,0 +1,46 @@
+name: Daily social post (FB + IG)
+
+on:
+  schedule:
+    # 14:15 UTC daily — after the existing Telegram/FB blog crons so it doesn't
+    # collide, and the day's newest post already exists.
+    - cron: "15 14 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Write the caption but do not post"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-social
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # generate-social-post.mjs uses only Node built-ins — no install needed.
+      - name: Post the newest article image to Facebook + Instagram
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL }}
+          SITE_BASE: https://blog.nexitel.us
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          META_PAGE_ID: ${{ secrets.META_PAGE_ID }}
+          META_IG_USER_ID: ${{ secrets.META_IG_USER_ID }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            npm run social:post -- --dry-run
+          else
+            npm run social:post
+          fi

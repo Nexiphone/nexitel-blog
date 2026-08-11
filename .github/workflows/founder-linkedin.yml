@@ -1,0 +1,64 @@
+name: Founder LinkedIn post (portfolio)
+
+on:
+  schedule:
+    # Mon, Wed, Fri at 15:00 UTC (~11:00 AM ET) — prime LinkedIn engagement time.
+    - cron: "0 15 * * 1,3,5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Render the poster but do not post"
+        type: boolean
+        default: false
+      key:
+        description: "Force a specific project key (optional)"
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: founder-linkedin
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install render dependencies
+        run: npm install --no-audit --no-fund satori @resvg/resvg-js
+
+      - name: Generate and post the founder portfolio post
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL }}
+          LI_ACCESS_TOKEN: ${{ secrets.LI_ACCESS_TOKEN }}
+          LI_PERSON_ID: ${{ secrets.LI_PERSON_ID }}
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.key }}" ]; then ARGS="--key=${{ inputs.key }}"; fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            node scripts/generate-founder-post.mjs --dry-run $ARGS
+          else
+            node scripts/generate-founder-post.mjs $ARGS
+          fi
+
+      - name: Commit rotation state
+        if: ${{ inputs.dry_run != 'true' }}
+        run: |
+          if ! git diff --quiet -- scripts/founder-post-log.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add scripts/founder-post-log.json
+            git commit -m "chore: founder LinkedIn post $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "founder-post-log.json unchanged; nothing to commit."
+          fi

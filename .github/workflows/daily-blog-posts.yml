@@ -26,7 +26,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install dependencies
         run: |
@@ -36,16 +36,32 @@ jobs:
       - name: Generate daily blog posts
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/generate-daily-posts.mjs
 
       - name: Commit and push new posts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add posts/
+          git add posts/ public/images/blog/
           if git diff --cached --quiet; then
             echo "No new posts to commit."
           else
             git commit -m "add: 2 daily blog posts in EN/ZH/ES for $(date -u +%Y-%m-%d)"
-            git push
+            # Rebase our new posts on top of anything that landed during the run,
+            # then retry the push against concurrent daily jobs + Vercel pushing to main.
+            git pull --rebase --autostash origin main
+            for attempt in 1 2 3 4 5; do
+              if git push origin main; then
+                echo "Push succeeded on attempt $attempt."
+                exit 0
+              fi
+              echo "Push attempt $attempt failed; rebasing on latest main and retrying..."
+              sleep 5
+              git pull --rebase --autostash origin main
+            done
+            echo "Push failed after 5 attempts."
+            exit 1
           fi

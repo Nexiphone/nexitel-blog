@@ -1,0 +1,63 @@
+name: Daily poster (FB + IG)
+
+on:
+  schedule:
+    # 17:15 UTC daily (~1:15pm ET) — spaced well apart from the blog-share jobs.
+    - cron: "15 17 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Render the poster but do not upload or post"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-poster
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Repo has no lockfile; install the poster's render deps (declared in
+      # package.json devDependencies) at runtime.
+      - name: Install render dependencies
+        run: npm install --no-audit --no-fund satori @resvg/resvg-js qrcode
+
+      - name: Generate and post today's poster
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          IMGBB_API_KEY: ${{ secrets.IMGBB_API_KEY }}
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          META_PAGE_ID: ${{ secrets.META_PAGE_ID }}
+          META_IG_USER_ID: ${{ secrets.META_IG_USER_ID }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            npm run poster:generate -- --dry-run
+          else
+            npm run poster:generate
+          fi
+
+      - name: Commit poster history
+        if: ${{ inputs.dry_run != 'true' }}
+        run: |
+          if ! git diff --quiet -- content/poster-history.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add content/poster-history.json
+            git commit -m "chore: record daily poster for $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "poster-history.json unchanged; nothing to commit."
+          fi

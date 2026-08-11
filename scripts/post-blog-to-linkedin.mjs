@@ -18,7 +18,7 @@ const logPath = path.join(__dirname, 'li-blog-log.json');
 const LOCALES = ['en', 'zh', 'es'];
 const NEXT_LOCALE = { en: 'zh', zh: 'es', es: 'en' };
 const BLOG_BASE_URL = (process.env.BLOG_BASE_URL || 'https://nexitel-blog.vercel.app').replace(/\/$/, '');
-const LI_API_VERSION = '202401';
+const LI_API_VERSION = '202506';
 
 function readLog() {
   if (!fs.existsSync(logPath)) {

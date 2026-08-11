@@ -1,0 +1,73 @@
+name: Backfill post images
+
+# Manual only. Replaces the heavily-reused static cover images with a unique,
+# on-topic Pexels photo per post. Run with a small `limit` first to spot-check
+# quality, then run again with no limit for the full set.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Max number of posts to process (blank = all)"
+        type: string
+        default: ""
+      force:
+        description: "Refetch even if an image already exists for the slug"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backfill-post-images
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save @anthropic-ai/sdk
+
+      - name: Backfill cover images
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.limit }}" ]; then ARGS="$ARGS --limit=${{ inputs.limit }}"; fi
+          if [ "${{ inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
+          node scripts/backfill-post-images.mjs $ARGS
+
+      - name: Commit and push updated images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add posts/ public/images/blog/
+          if git diff --cached --quiet; then
+            echo "No image changes to commit."
+          else
+            git commit -m "content: unique on-topic cover images ($(date -u +%Y-%m-%d))"
+            # Rebase onto anything that landed during the run, then retry the push
+            # against concurrent daily jobs + Vercel pushing to main.
+            git pull --rebase --autostash origin main
+            for attempt in 1 2 3 4 5; do
+              if git push origin main; then
+                echo "Push succeeded on attempt $attempt."
+                exit 0
+              fi
+              echo "Push attempt $attempt failed; rebasing on latest main and retrying..."
+              sleep 5
+              git pull --rebase --autostash origin main
+            done
+            echo "Push failed after 5 attempts."
+            exit 1
+          fi
