@@ -37,7 +37,7 @@ const dryRun = process.argv.includes("--dry-run");
 const mock = process.argv.includes("--mock");
 
 // Where the poster's QR code + caption link point.
-const SITE_URL = "https://nexitel.us";
+const SITE_URL = "https://www.nexitel.us";
 
 // Brand palette (tailwind nexitel.*)
 const INK = "#0f0a2e"; // darker
