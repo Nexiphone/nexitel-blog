@@ -26,7 +26,16 @@ function readTimeMinutes(body) {
   return Math.max(1, Math.ceil(words / 200));
 }
 
-async function publishPostToDbImpl(slug, perLocale) {
+/**
+ * Build the `blog_posts` row for a slug from its raw per-locale .mdx.
+ *
+ * Pure and side-effect free, so callers that need to know what WOULD be
+ * written (e.g. the dry run in scripts/resync-blog-db.mjs) can build the
+ * exact same row without duplicating this logic and drifting from it.
+ *
+ * Returns null when there is no English content to key on.
+ */
+export function buildRow(slug, perLocale) {
   // perLocale = { en, zh, es } — each the RAW .mdx content (frontmatter + body).
   // gray-matter parses each into { data: frontmatter, content: body }.
   const parsed = {};
@@ -43,17 +52,14 @@ async function publishPostToDbImpl(slug, perLocale) {
   // English is the base for the shared (non-language) columns, matching the
   // one-time import that seeded the table.
   const en = parsed.en;
-  if (!en) {
-    console.error(`DB publish skipped for ${slug}: no English content to key on.`);
-    return;
-  }
+  if (!en) return null;
 
   const title = (loc) => (parsed[loc] ? parsed[loc].data.title ?? null : null);
   const desc = (loc) => (parsed[loc] ? parsed[loc].data.description ?? null : null);
   const body = (loc) => (parsed[loc] ? parsed[loc].body : null);
   const read = (loc) => (parsed[loc] ? readTimeMinutes(parsed[loc].body) : null);
 
-  const row = {
+  return {
     slug,
     category: en.data.category ?? "",
     cover_image_url: en.data.image ?? null, // frontmatter `image`
@@ -65,6 +71,14 @@ async function publishPostToDbImpl(slug, perLocale) {
     body_en: body("en"), body_zh: body("zh"), body_es: body("es"),
     read_en: read("en"), read_zh: read("zh"), read_es: read("es"),
   };
+}
+
+async function publishPostToDbImpl(slug, perLocale) {
+  const row = buildRow(slug, perLocale);
+  if (!row) {
+    console.error(`DB publish skipped for ${slug}: no English content to key on.`);
+    return;
+  }
 
   const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false },

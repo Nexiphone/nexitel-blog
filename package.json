@@ -15,7 +15,8 @@
     "post:li-promo": "node scripts/post-promo-to-linkedin.mjs",
     "social:post": "node scripts/generate-social-post.mjs",
     "poster:generate": "node scripts/generate-poster.mjs",
-    "founder:post": "node scripts/generate-founder-post.mjs"
+    "founder:post": "node scripts/generate-founder-post.mjs",
+    "db:resync": "node scripts/resync-blog-db.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.0",
