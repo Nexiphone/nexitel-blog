@@ -90,7 +90,15 @@ const APEX_HOP_RE = /https:\/\/nexitel\.us(?!\/(?:logo\.png))/g;
 const countMatches = (text, re) =>
   typeof text === "string" ? (text.match(re) ?? []).length : 0;
 
-/** Fields the resync is responsible for. published_at is compared separately. */
+/**
+ * Fields the resync is responsible for, compared verbatim.
+ *
+ * published_at is NOT in this list and is compared separately below: the column
+ * comes back as a timestamp ("2026-02-25T00:00:00+00:00") while the frontmatter
+ * holds a plain date ("2026-02-25"), so a verbatim compare would flag all 224
+ * rows as changed. It still rides along on every upsert via buildRow(), so any
+ * genuine drift is reported rather than being rewritten unannounced.
+ */
 const CONTENT_FIELDS = [
   "category",
   "cover_image_url",
@@ -135,6 +143,18 @@ async function fetchAllRows(sb) {
 
 const pct = (n, d) => (d === 0 ? "0.0" : ((n / d) * 100).toFixed(1));
 
+/**
+ * Reduce either representation of a publish date to YYYY-MM-DD so the mirror's
+ * timestamp and the frontmatter's plain date can be compared for real drift.
+ * Returns null for anything unparseable, which compares equal to nothing.
+ */
+function dateKey(value) {
+  if (!value) return null;
+  const s = String(value);
+  const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : null;
+}
+
 // ----------------------------------------------------------------- main
 
 const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
@@ -161,6 +181,7 @@ const toUpdate = [];
 const unchanged = [];
 const skippedNoEnglish = [];
 const missingLocales = [];
+const dateDrift = [];
 
 let deadBefore = 0;
 let deadAfter = 0;
@@ -208,6 +229,16 @@ for (const [slug, perLocale] of repoPosts) {
     const b = row[f] ?? null;
     return a !== b;
   });
+
+  // Date drift is tracked but deliberately does NOT make a row "changed": we
+  // never churn 224 publish dates just to resync links. It only matters when
+  // the row is being rewritten anyway, so flag exactly those.
+  const dbDate = dateKey(existing.published_at);
+  const repoDate = dateKey(row.published_at);
+  if (dbDate && repoDate && dbDate !== repoDate) {
+    dateDrift.push({ slug, from: dbDate, to: repoDate, rewritten: diffs.length > 0 });
+  }
+
   if (diffs.length === 0) unchanged.push(slug);
   else toUpdate.push({ slug, row, diffs });
 }
@@ -265,6 +296,18 @@ if (missingLocales.length) {
   }
   if (!verbose && missingLocales.length > 10) {
     console.log(`    ... and ${missingLocales.length - 10} more (--verbose to list all)`);
+  }
+  console.log();
+}
+
+if (dateDrift.length) {
+  const rewritten = dateDrift.filter((d) => d.rewritten);
+  console.log(`=== ${dateDrift.length} slugs whose published_at differs from frontmatter ===`);
+  console.log(`  ${rewritten.length} sit on rows this resync would rewrite — their date`);
+  console.log("  WOULD be changed to the frontmatter value as a side effect.");
+  console.log(`  The other ${dateDrift.length - rewritten.length} are on otherwise-identical rows and stay untouched.`);
+  for (const { slug, from, to, rewritten: r } of (rewritten.length ? rewritten : dateDrift).slice(0, verbose ? Infinity : 10)) {
+    console.log(`    ${slug}  ${from} -> ${to}${r ? "" : "  (not rewritten)"}`);
   }
   console.log();
 }
