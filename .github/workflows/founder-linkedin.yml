@@ -1,9 +1,25 @@
 name: Founder LinkedIn post (portfolio)
 
 on:
-  schedule:
-    # Mon, Wed, Fri at 15:00 UTC (~11:00 AM ET) — prime LinkedIn engagement time.
-    - cron: "0 15 * * 1,3,5"
+  # DISABLED: this workflow has been switched off server-side since roughly
+  # 2026-06-11 — it ran three times by hand the day after it was added and has
+  # not run since. The reason was never written down, so this comment does not
+  # invent one; the schedule is commented out only so the file agrees with the
+  # state the repository has actually been in for months. Left as it was, the
+  # cron would resume the moment anyone ran `gh workflow enable`, which is a
+  # surprise nobody would be expecting from that command.
+  #
+  # Unlike the blog crons disabled alongside it, there is no known problem with
+  # what this one posts: it links no blog URLs at all, and its poster art is
+  # self-contained. If you want it back, it may well be fine as-is — check
+  # whether the LinkedIn token in the job env is still valid first.
+  #
+  # To re-enable: uncomment the schedule below AND run
+  #   gh workflow enable "Founder LinkedIn post (portfolio)"
+  #
+  # Mon, Wed, Fri at 15:00 UTC (~11:00 AM ET) — prime LinkedIn engagement time.
+  # schedule:
+  #   - cron: "0 15 * * 1,3,5"
   workflow_dispatch:
     inputs:
       dry_run:
