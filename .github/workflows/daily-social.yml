@@ -1,10 +1,19 @@
 name: Daily social post (FB + IG)
 
 on:
-  schedule:
-    # 14:15 UTC daily — after the existing Telegram/FB blog crons so it doesn't
-    # collide, and the day's newest post already exists.
-    - cron: "15 14 * * *"
+  # DISABLED 2026-08-16: different cause from the three blog crons. This one
+  # reads SITE_BASE (hardcoded to https://blog.nexitel.us in the job env below),
+  # not BLOG_BASE_URL, so its links resolve — but they point at the host being
+  # retired in favour of www.nexitel.us, and it picks the NEWEST post, which is
+  # in the set that has never been mirrored to the canonical site.
+  # Also disabled server-side via `gh workflow disable "Daily social post (FB + IG)"`.
+  # To re-enable: uncomment the schedule below AND run
+  #   gh workflow enable "Daily social post (FB + IG)"
+  #
+  # schedule:
+  #   # 14:15 UTC daily — after the existing Telegram/FB blog crons so it doesn't
+  #   # collide, and the day's newest post already exists.
+  #   - cron: "15 14 * * *"
   workflow_dispatch:
     inputs:
       dry_run:

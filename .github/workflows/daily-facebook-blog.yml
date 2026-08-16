@@ -1,10 +1,17 @@
 name: Daily Facebook blog post
 
 on:
+  # DISABLED 2026-08-16: same cause as the Telegram blog cron — it links to
+  # ${BLOG_BASE_URL}, where 190 of the 224 posts 404. Picks the OLDEST unposted
+  # post, so 183 of its 205 remaining picks are dead links.
+  # Also disabled server-side via `gh workflow disable "Daily Facebook blog post"`.
+  # To re-enable: uncomment the schedule below AND run
+  #   gh workflow enable "Daily Facebook blog post"
+  #
   # 13:32 UTC ~ 9:32 AM Eastern. 15 min after the Telegram blog cron so the
   # two platforms don't post at the exact same minute.
-  schedule:
-    - cron: '32 13 * * *'
+  # schedule:
+  #   - cron: '32 13 * * *'
   workflow_dispatch:
 
 permissions:

@@ -1,9 +1,16 @@
 name: Daily LinkedIn blog post
 
 on:
+  # DISABLED 2026-08-16: same cause as the Telegram and Facebook blog crons — it
+  # links to ${BLOG_BASE_URL}, where 190 of the 224 posts 404. Picks the OLDEST
+  # unposted post, so 185 of its 212 remaining picks are dead links.
+  # Also disabled server-side via `gh workflow disable "Daily LinkedIn blog post"`.
+  # To re-enable: uncomment the schedule below AND run
+  #   gh workflow enable "Daily LinkedIn blog post"
+  #
   # 13:47 UTC ~ 9:47 AM Eastern. 15 min after FB blog, 30 after Telegram blog.
-  schedule:
-    - cron: '47 13 * * *'
+  # schedule:
+  #   - cron: '47 13 * * *'
   workflow_dispatch:
 
 permissions:

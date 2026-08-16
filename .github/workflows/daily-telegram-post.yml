@@ -1,10 +1,18 @@
 name: Daily Telegram post
 
 on:
+  # DISABLED 2026-08-16: links every post it sends to ${BLOG_BASE_URL}, and only
+  # 34 of the 224 posts on disk exist on www.nexitel.us — the other 190 return
+  # 404. This queue picks the OLDEST unposted post, so 109 of its 115 remaining
+  # picks are dead links, starting with the next run.
+  # Also disabled server-side via `gh workflow disable "Daily Telegram post"`.
+  # To re-enable: uncomment the schedule below AND run
+  #   gh workflow enable "Daily Telegram post"
+  #
   # 13:17 UTC ~ 9:17 AM Eastern. Off-the-hour to avoid the GitHub Actions
   # cron stampede that can delay jobs by 10+ minutes.
-  schedule:
-    - cron: '17 13 * * *'
+  # schedule:
+  #   - cron: '17 13 * * *'
   workflow_dispatch:
 
 permissions:
