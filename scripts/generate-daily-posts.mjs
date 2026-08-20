@@ -13,6 +13,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
+import { createClient } from "@supabase/supabase-js";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { publishPostToDb } from "./lib/publish-db.mjs";
@@ -44,6 +45,41 @@ function readLedger() {
 function writeLedger(ledger) {
   const obj = Object.fromEntries([...ledger.entries()].sort());
   writeFileSync(PHOTO_LEDGER, JSON.stringify(obj, null, 2) + "\n");
+}
+
+/**
+ * Publish the cover to Supabase Storage and return its public URL.
+ *
+ * nexitel.us serves images from its own public/ directory, which this repo
+ * cannot write to - so a cover saved only here would render as a broken image
+ * on the live site. Storage is the one place both sites can read, and the
+ * generator already holds the credentials for it, so no new token is needed.
+ *
+ * Returns null on any failure; the caller then skips the post rather than
+ * shipping it with a cover the site cannot load.
+ */
+async function uploadCover(slug, buf) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    console.warn("  SUPABASE_URL / SERVICE_ROLE_KEY not set - cannot publish cover");
+    return null;
+  }
+  try {
+    const db = createClient(url, key, { auth: { persistSession: false } });
+    const path = `${slug}.jpg`;
+    const { error } = await db.storage
+      .from("blog-images")
+      .upload(path, buf, { contentType: "image/jpeg", upsert: true });
+    if (error) {
+      console.warn(`  storage upload failed: ${error.message}`);
+      return null;
+    }
+    return db.storage.from("blog-images").getPublicUrl(path).data.publicUrl;
+  } catch (err) {
+    console.warn(`  storage upload threw: ${err.message}`);
+    return null;
+  }
 }
 
 /** sha1 of every cover already on disk, so a repeat cannot slip through. */
@@ -97,11 +133,15 @@ async function fetchAndSaveImage(slug, query) {
         console.warn(`  candidate is byte-identical to an existing cover - trying the next`);
         continue;
       }
+      // Keep a copy in the repo (it is what the hash guard reads on the next
+      // run) AND publish it where the live site can actually fetch it.
       if (!existsSync(IMAGES_DIR)) mkdirSync(IMAGES_DIR, { recursive: true });
       writeFileSync(join(IMAGES_DIR, `${slug}.jpg`), buf);
+      const publicUrl = await uploadCover(slug, buf);
+      if (!publicUrl) return null;
       ledger.set(slug, String(p.id));
       writeLedger(ledger);
-      return `/images/blog/${slug}.jpg`;
+      return publicUrl;
     }
     console.warn(`  no UNUSED photo for "${query}" - skipping rather than repeating`);
     return null;
