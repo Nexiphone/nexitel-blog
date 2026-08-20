@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
+import { pickLive } from './lib/live-url.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,12 +57,11 @@ function listPosts(locale) {
     });
 }
 
-function pickOldestUnposted(posts, postedSlugs) {
-  const posted = new Set(postedSlugs);
-  const pool = posts.filter((p) => !posted.has(p.slug) && p.date);
-  if (pool.length === 0) return null;
+function candidatePool(posts, postedSlugs, skippedSlugs = []) {
+  const excluded = new Set([...postedSlugs, ...skippedSlugs]);
+  const pool = posts.filter((p) => !excluded.has(p.slug) && p.date);
   pool.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  return pool[0];
+  return pool;
 }
 
 function htmlEscape(s) {
@@ -134,7 +134,17 @@ async function main() {
       continue;
     }
 
-    const next = pickOldestUnposted(posts, log.telegram[locale]);
+    const pool = candidatePool(posts, log.telegram[locale], log.skipped?.[locale] ?? []);
+    // Only publish a link that resolves — the .mdx files on disk include posts
+    // that are no longer published, and posting those puts dead links on the page.
+    const { post: next, skipped } = await pickLive(
+      pool,
+      (p) => `${BLOG_BASE_URL}/${locale}/blog/${p.slug}`,
+    );
+    if (skipped.length) {
+      log.skipped ??= {};
+      log.skipped[locale] = [...(log.skipped[locale] ?? []), ...skipped];
+    }
     if (!next) {
       console.warn(`[${locale}] backlog exhausted — every post has been sent.`);
       continue;
