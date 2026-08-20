@@ -20,6 +20,7 @@
  *
  * Flags:
  *   --limit=N   only process the first N slugs (for a test run)
+ *   --slugs=a,b only process these slugs (use for published-only runs)
  *   --force     refetch even if public/images/blog/<slug>.jpg already exists
  *   --dry-run   log what would happen; fetch nothing, write nothing
  *
@@ -43,6 +44,20 @@ const LIMIT = (() => {
   return a ? parseInt(a.split("=")[1], 10) : Infinity;
 })();
 const FORCE = args.includes("--force");
+// Restrict the run to an explicit slug list. Without it the script walks every
+// .mdx on disk, which now includes ~190 posts that are no longer published -
+// wasting Pexels quota on dead content and burning through the free tier's
+// hourly limit before it reaches anything live.
+const ONLY_SLUGS = (() => {
+  const a = args.find((x) => x.startsWith("--slugs="));
+  if (!a) return null;
+  const list = a
+    .slice("--slugs=".length)
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean);
+  return list.length ? new Set(list) : null;
+})();
 const DRY_RUN = args.includes("--dry-run");
 
 const PEXELS_KEY = process.env.PEXELS_API_KEY;
@@ -186,7 +201,13 @@ function setImagePath(file, imagePath) {
 }
 
 async function main() {
-  const all = collectPosts();
+  const collected = collectPosts();
+  const all = ONLY_SLUGS ? collected.filter((p) => ONLY_SLUGS.has(p.slug)) : collected;
+  if (ONLY_SLUGS) {
+    const missing = [...ONLY_SLUGS].filter((s) => !collected.some((p) => p.slug === s));
+    console.log(`--slugs: ${all.length} of ${ONLY_SLUGS.size} requested slugs found on disk`);
+    if (missing.length) console.warn(`  not found: ${missing.join(", ")}`);
+  }
   const posts = all.slice(0, LIMIT === Infinity ? all.length : LIMIT);
   console.log(`Backfilling images for ${posts.length} of ${all.length} posts${DRY_RUN ? " (DRY RUN)" : ""}...`);
 
