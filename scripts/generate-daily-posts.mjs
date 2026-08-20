@@ -11,7 +11,9 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import { readdirSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { createClient } from "@supabase/supabase-js";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { publishPostToDb } from "./lib/publish-db.mjs";
@@ -22,28 +24,127 @@ const POSTS_DIR = join(ROOT, "posts");
 const IMAGES_DIR = join(ROOT, "public", "images", "blog");
 
 /**
- * Fetch a unique, on-topic landscape photo from Pexels and save it as
- * <slug>.jpg, returning the public path. Returns null if no key / no result /
- * any failure, so the caller can fall back to the static image pool.
+ * Ledger of Pexels photo IDs already used as a cover, committed to the repo so
+ * it survives between CI runs.
+ *
+ * Without it every run asked Pexels for a query and took photos[0], which meant
+ * two posts on related topics got byte-identical covers. That is how the blog
+ * ended up with 224 posts sharing 22 images.
+ */
+const PHOTO_LEDGER = join(__dirname, "used-photo-ids.json");
+
+function readLedger() {
+  try {
+    const raw = JSON.parse(readFileSync(PHOTO_LEDGER, "utf8"));
+    return new Map(Object.entries(raw));
+  } catch {
+    return new Map();
+  }
+}
+
+function writeLedger(ledger) {
+  const obj = Object.fromEntries([...ledger.entries()].sort());
+  writeFileSync(PHOTO_LEDGER, JSON.stringify(obj, null, 2) + "\n");
+}
+
+/**
+ * Publish the cover to Supabase Storage and return its public URL.
+ *
+ * nexitel.us serves images from its own public/ directory, which this repo
+ * cannot write to - so a cover saved only here would render as a broken image
+ * on the live site. Storage is the one place both sites can read, and the
+ * generator already holds the credentials for it, so no new token is needed.
+ *
+ * Returns null on any failure; the caller then skips the post rather than
+ * shipping it with a cover the site cannot load.
+ */
+async function uploadCover(slug, buf) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    console.warn("  SUPABASE_URL / SERVICE_ROLE_KEY not set - cannot publish cover");
+    return null;
+  }
+  try {
+    const db = createClient(url, key, { auth: { persistSession: false } });
+    const path = `${slug}.jpg`;
+    const { error } = await db.storage
+      .from("blog-images")
+      .upload(path, buf, { contentType: "image/jpeg", upsert: true });
+    if (error) {
+      console.warn(`  storage upload failed: ${error.message}`);
+      return null;
+    }
+    return db.storage.from("blog-images").getPublicUrl(path).data.publicUrl;
+  } catch (err) {
+    console.warn(`  storage upload threw: ${err.message}`);
+    return null;
+  }
+}
+
+/** sha1 of every cover already on disk, so a repeat cannot slip through. */
+function hashesOfExistingImages() {
+  const out = new Set();
+  if (!existsSync(IMAGES_DIR)) return out;
+  for (const name of readdirSync(IMAGES_DIR)) {
+    if (!/\.(jpg|jpeg|png|webp)$/i.test(name)) continue;
+    try {
+      out.add(createHash("sha1").update(readFileSync(join(IMAGES_DIR, name))).digest("hex"));
+    } catch {}
+  }
+  return out;
+}
+
+/**
+ * Fetch an UNUSED on-topic landscape photo and save it as <slug>.jpg.
+ *
+ * Returns null when no key, no query, no unused result, or any failure. The
+ * caller must then SKIP the post: there is deliberately no static fallback
+ * pool, because falling back is precisely what produced the duplicates.
  */
 async function fetchAndSaveImage(slug, query) {
   const key = process.env.PEXELS_API_KEY;
   if (!key || !query) return null;
+  const ledger = readLedger();
+  const used = new Set(ledger.values());
   try {
+    // per_page=30 (not 15) so there is room to skip past already-used photos.
     const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=15&orientation=landscape`,
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=30&orientation=landscape`,
       { headers: { Authorization: key } },
     );
     if (!res.ok) return null;
     const data = await res.json();
-    const photo = Array.isArray(data.photos) ? data.photos[0] : null;
-    const src = photo?.src?.landscape || photo?.src?.large2x || photo?.src?.large;
-    if (!src) return null;
-    const imgRes = await fetch(src);
-    if (!imgRes.ok) return null;
-    if (!existsSync(IMAGES_DIR)) mkdirSync(IMAGES_DIR, { recursive: true });
-    writeFileSync(join(IMAGES_DIR, `${slug}.jpg`), Buffer.from(await imgRes.arrayBuffer()));
-    return `/images/blog/${slug}.jpg`;
+    const photos = Array.isArray(data.photos) ? data.photos : [];
+    // Two independent guards, because the ID ledger alone is not enough: the
+    // one-off backfill that gave the existing posts their covers never recorded
+    // its photo IDs, so the ledger cannot know about them. Hashing the bytes
+    // catches a duplicate whatever its ID says.
+    const existingHashes = hashesOfExistingImages();
+    for (const p of photos) {
+      if (used.has(String(p.id))) continue;
+      const src = p.src?.landscape || p.src?.large2x || p.src?.large;
+      if (!src) continue;
+      const imgRes = await fetch(src);
+      if (!imgRes.ok) continue;
+      const buf = Buffer.from(await imgRes.arrayBuffer());
+      const hash = createHash("sha1").update(buf).digest("hex");
+      if (existingHashes.has(hash)) {
+        console.warn(`  candidate is byte-identical to an existing cover - trying the next`);
+        continue;
+      }
+      // Keep a copy in the repo (it is what the hash guard reads on the next
+      // run) AND publish it where the live site can actually fetch it.
+      if (!existsSync(IMAGES_DIR)) mkdirSync(IMAGES_DIR, { recursive: true });
+      writeFileSync(join(IMAGES_DIR, `${slug}.jpg`), buf);
+      const publicUrl = await uploadCover(slug, buf);
+      if (!publicUrl) return null;
+      ledger.set(slug, String(p.id));
+      writeLedger(ledger);
+      return publicUrl;
+    }
+    console.warn(`  no UNUSED photo for "${query}" - skipping rather than repeating`);
+    return null;
   } catch {
     return null;
   }
@@ -57,14 +158,6 @@ if (!apiKey) {
 
 const client = new Anthropic({ apiKey });
 
-const AVAILABLE_IMAGES = [
-  "5g-coverage.jpg", "att-mvno.jpg", "avoid-overpaying.jpg", "best-prepaid-sim.jpg",
-  "carrier-suspend.jpg", "cheapest-unlimited.jpg", "data-iot.jpg", "esim-activation.jpg",
-  "esim-vs-sim.jpg", "hidden-fees.jpg", "international-roaming.jpg", "international-travel.jpg",
-  "nexi-volt-recharge.jpg", "nexitalk-voip.jpg", "no-contract.jpg", "prepaid-vs-postpaid.jpg",
-  "seniors.jpg", "small-business.jpg", "switch-prepaid.jpg", "tmobile-5g.jpg",
-  "tourist-usa.jpg", "wifi-calling.jpg",
-];
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -174,8 +267,7 @@ Return ONLY a JSON array (no markdown, no commentary) like this:
 
 "photoQuery" must describe the post's main HUMAN SUBJECT or scenario as a photographer would shoot it (e.g. "indian student campus", "warehouse worker scanning", "family video call"). NEVER use abstract telecom words like "prepaid", "plan", "SIM", "5G", "coverage" — those don't photograph well. It drives a real, unique cover photo per post.
 
-"image" is only a fallback if the photo fetch fails — pick from: ${AVAILABLE_IMAGES.join(", ")}
-Pick TWO DIFFERENT images and TWO DIFFERENT target countries for the two posts.`;
+Pick TWO DIFFERENT target countries for the two posts.`;
 
 async function generateTopics() {
   const message = await client.messages.create({
@@ -217,7 +309,7 @@ description: "<description in ${localeNames[locale]}, 150-160 chars>"
 date: "${today}"
 category: "${topic.category}"
 author: "${authors[locale]}"
-image: "/images/blog/${topic.image}"
+image: "PLACEHOLDER"   # overwritten with the fetched cover path
 ---
 
 Then the body: ~80-110 lines of markdown, starting with H2. Use H2/H3, bullets, numbered lists. Link to https://www.nexitel.us/plans and https://www.nexitel.us/nexitalk only. Mention NexiTalk and Nexi Volt by name where relevant, but do not link Nexi Volt. End with a strong CTA. No "Contact Us" section.
@@ -240,11 +332,15 @@ async function main() {
   console.log("Generated topics:", topics.map((t) => t.slug));
 
   for (const topic of topics) {
-    // Fetch a unique, on-topic cover photo. Fall back to the static pool if the
-    // Pexels fetch is unavailable or fails.
-    const fetched = await fetchAndSaveImage(topic.slug, topic.photoQuery || topic.title);
-    const imagePath = fetched || `/images/blog/${topic.image}`;
-    console.log(`Image for ${topic.slug}: ${imagePath}${fetched ? " (Pexels)" : " (fallback)"}`);
+    // Every post gets its OWN photo or it does not ship. There is no shared
+    // fallback pool any more: a skipped post costs one slot, a repeated cover
+    // costs the whole set its credibility as original content.
+    const imagePath = await fetchAndSaveImage(topic.slug, topic.photoQuery || topic.title);
+    if (!imagePath) {
+      console.warn(`SKIP ${topic.slug}: no unique cover image available.`);
+      continue;
+    }
+    console.log(`Image for ${topic.slug}: ${imagePath}`);
 
     // Collect each locale's MDX so we can mirror the post to the DB after the
     // files are on disk.
