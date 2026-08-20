@@ -14,6 +14,10 @@ on:
         description: "Refetch even if an image already exists for the slug"
         type: boolean
         default: false
+      slugs:
+        description: "Comma-separated slugs to process (blank = every post on disk)"
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -45,6 +49,7 @@ jobs:
           ARGS=""
           if [ -n "${{ inputs.limit }}" ]; then ARGS="$ARGS --limit=${{ inputs.limit }}"; fi
           if [ "${{ inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
+          if [ -n "${{ inputs.slugs }}" ]; then ARGS="$ARGS --slugs=${{ inputs.slugs }}"; fi
           node scripts/backfill-post-images.mjs $ARGS
 
       - name: Commit and push updated images
