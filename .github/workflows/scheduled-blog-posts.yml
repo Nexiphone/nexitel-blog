@@ -1,21 +1,23 @@
-name: Daily blog posts
+name: Scheduled blog posts
 
 on:
-  # DISABLED 2026-08-10: daily post generation stopped by request.
-  # Also disabled server-side via `gh workflow disable "Daily blog posts"`.
-  # To re-enable: uncomment the schedule below AND run
-  #   gh workflow enable "Daily blog posts"
+  # ONE post per run, Tuesday and Thursday — not daily, and not three locales.
+  # The previous daily x2 posts x3 locales pace produced 224 posts sharing 22
+  # cover images, of which Google indexed 6; 191 have since been unpublished.
   #
-  # 13:31 UTC ~ 9:31 AM Eastern. Off-the-hour to avoid the cron stampede.
-  # schedule:
-  #   - cron: '31 13 * * *'
+  # 14:07 UTC ~ 10:07 AM Eastern. Off-the-hour to avoid the cron stampede.
+  #
+  # Still disabled server-side. To start the cadence:
+  #   gh workflow enable "Scheduled blog posts" --repo Nexiphone/nexitel-blog
+  schedule:
+    - cron: '7 14 * * 2,4'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: daily-blog-posts
+  group: scheduled-blog-posts
   cancel-in-progress: false
 
 jobs:

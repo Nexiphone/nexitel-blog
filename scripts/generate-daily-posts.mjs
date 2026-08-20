@@ -33,6 +33,10 @@ const IMAGES_DIR = join(ROOT, "public", "images", "blog");
  */
 const PHOTO_LEDGER = join(__dirname, "used-photo-ids.json");
 
+// English + Chinese only. Spanish was dropped for new posts: none of the dealer
+// markets speak it, and the existing Spanish posts stay published untouched.
+const LOCALES = ["en", "zh"];
+
 function readLedger() {
   try {
     const raw = JSON.parse(readFileSync(PHOTO_LEDGER, "utf8"));
@@ -164,7 +168,7 @@ const today = new Date().toISOString().split("T")[0];
 // Get list of existing slugs to avoid duplicates
 function getExistingSlugs() {
   const slugs = new Set();
-  for (const locale of ["en", "zh", "es"]) {
+  for (const locale of LOCALES) {
     const dir = join(POSTS_DIR, locale);
     if (existsSync(dir)) {
       for (const file of readdirSync(dir)) {
@@ -209,65 +213,58 @@ Write helpful, informative posts that solve REAL problems these audiences face. 
 - NOT include any "Contact Us" section (handled by the layout)
 - Be informative and helpful, not salesy`;
 
-const TOPIC_GENERATION_PROMPT = `Generate 2 fresh, unique SEO blog post topics about Nexitel prepaid wireless plans, TARGETED AT ONE OF THESE COUNTRIES per post:
+const TOPIC_GENERATION_PROMPT = `Generate 2 candidate SEO blog post topics for Nexitel, a US prepaid wireless carrier. Only ONE will be published — the second is a spare in case the first cannot be produced.
 
-🇮🇳 India  |  🇨🇳 China  |  🇹🇼 Taiwan  |  🇦🇪 UAE/Dubai  |  🇪🇬 Egypt
+Nexitel sells to two audiences, and BOTH are business-critical:
+1. DEALERS AND DISTRIBUTORS, mostly outside the US, who buy prepaid SIMs and eSIMs in bulk and resell them.
+2. END USERS in the US who activate a line on nexitel.us.
 
-The 2 topics should target 2 DIFFERENT countries (e.g., one India + one China, or one Dubai + one Egypt).
+Products: Nexitel Blue runs on the AT&T network. Nexitel Purple runs on the T-Mobile network. Both nationwide 5G, prepaid, no contract, no credit check. Physical SIM and eSIM. Plans from $5/month. Several Blue plans include calling to 100+ countries.
+
+PICK THE TOPIC FROM ONE OF THESE CLUSTERS. These are the only areas with demonstrated search demand — do not invent others:
+
+- BULK / DEALER: buying US SIMs in bulk, becoming a US carrier distributor, bulk activation, eSIM at volume, supplying US numbers to businesses abroad
+- PLANS AND PRICING: comparing Blue vs Purple, cheapest US prepaid plans, what $5-$35 a month actually buys, prepaid vs postpaid
+- PORTING / SWITCHING: keeping your number when switching, porting from another carrier, what happens to your old plan
+- ROAMING AND INTERNATIONAL: using a US number abroad, Wi-Fi calling overseas, international calling included in a plan, avoiding roaming charges
+- ESIM: activation, eSIM vs physical SIM, dual SIM, provisioning devices
+- IOT / M2M: data-only plans, fleet tracking, connected devices
+
+HARD RULES:
+- Write for someone deciding whether to BUY or RESELL, not for a general reader.
+- NO nationality-plus-occupation topics. Nothing shaped like "Indian student", "Filipino nurse", "Taiwanese researcher". That pattern produced hundreds of near-identical posts Google refused to index, and every one has been unpublished.
+- NO posts about sending mobile recharge home, remittances, or NexiTalk. Different products.
+- NEVER promise a specific price, allowance or minimum order beyond the ranges above. Pricing, margins and order minimums are never published.
+- AT&T and T-Mobile may be named in plain text as the underlying networks. Never imply partnership or endorsement.
+- The topic must be answerable concretely. Prefer a real question a buyer types into Google over a broad theme.
 
 DO NOT pick any of these existing topics (filenames):
 ${existingSlugs.join("\n")}
 
-GOOD TOPIC EXAMPLES (don't reuse exact phrasing — generate fresh variations):
+GOOD EXAMPLES of the shape wanted (generate fresh ones, do not reuse these):
+- "How many SIMs do you need to start reselling US prepaid?"
+- "Blue or Purple: which Nexitel network covers your area better"
+- "What happens to your old number when you port to prepaid"
+- "Does Wi-Fi calling work on a US number overseas?"
+- "eSIM vs physical SIM for a bulk deployment"
+- "What a $15 US prepaid plan actually includes in 2026"
 
-INDIA-focused:
-- "Best USA SIM card for Indian students arriving on F-1 visa"
-- "Cheap calls from USA to India: NexiTalk vs WhatsApp vs Skype"
-- "Sending Airtel/Jio recharge to family in India from USA"
-- "Best prepaid plan for H1B workers from India in the USA"
-- "Indian newlyweds moving to USA: setting up phones together"
-- "Tourist from India to USA: airport SIM vs Nexitel prepaid"
-
-CHINA-focused:
-- "Best USA prepaid SIM for Chinese international students"
-- "How to keep your China number alive while studying in USA"
-- "Top-up China Mobile/Unicom/Telecom from USA with Nexi Volt"
-- "Cheap calls from USA to China when WeChat won't connect"
-
-TAIWAN-focused:
-- "USA prepaid SIM card for Taiwanese students and immigrants"
-- "Best plan to call Taiwan (中華電信) from USA cheaply"
-- "Taiwanese tourist visiting USA: prepaid SIM guide"
-
-UAE/DUBAI-focused:
-- "Dubai resident traveling to USA: prepaid SIM before you land"
-- "Best USA prepaid SIM for Emirati students and businesspeople"
-- "Calling Dubai from USA: NexiTalk vs international roaming"
-- "Sending du/Etisalat recharge to UAE family from USA"
-
-EGYPT-focused:
-- "Best USA prepaid SIM for new Egyptian immigrants"
-- "Send Vodafone Egypt recharge from USA: complete guide"
-- "Egyptian students in USA: cheapest plan to call home"
-- "Tourist from Egypt to USA: prepaid SIM vs international roaming"
-
-Return ONLY a JSON array (no markdown, no commentary) like this:
+Return ONLY a JSON array (no markdown, no commentary):
 [
   {
     "slug": "kebab-case-slug-here-2026",
-    "title": "Title in English",
+    "title": "Title in English, under 60 characters",
     "description": "SEO meta description, 150-160 chars",
-    "category": "Guide" | "Plans" | "Technology" | "Travel",
-    "image": "filename-from-list.jpg",
+    "category": "Guide" | "Plans" | "Technology" | "Comparison",
     "photoQuery": "2-4 word stock-photo search query",
-    "targetCountry": "India" | "China" | "Taiwan" | "UAE" | "Egypt"
+    "cluster": "bulk" | "plans" | "porting" | "roaming" | "esim" | "iot"
   },
   { ... }
 ]
 
-"photoQuery" must describe the post's main HUMAN SUBJECT or scenario as a photographer would shoot it (e.g. "indian student campus", "warehouse worker scanning", "family video call"). NEVER use abstract telecom words like "prepaid", "plan", "SIM", "5G", "coverage" — those don't photograph well. It drives a real, unique cover photo per post.
+"photoQuery" must describe a photographable SCENE, not the subject matter — e.g. "warehouse worker scanning", "small shop counter", "person checking phone outdoors". NEVER abstract telecom words like "prepaid", "plan", "SIM", "5G", "coverage"; they do not photograph and produce generic stock. It drives a unique cover photo per post.
 
-Pick TWO DIFFERENT target countries for the two posts.`;
+The 2 candidates must come from DIFFERENT clusters.`;
 
 async function generateTopics() {
   const message = await client.messages.create({
@@ -331,7 +328,14 @@ async function main() {
   const topics = await generateTopics();
   console.log("Generated topics:", topics.map((t) => t.slug));
 
+  // ONE post per run. The model returns two candidates so that a topic whose
+  // cover cannot be sourced does not cost the whole run - the second is a
+  // spare, not a second publication. Two runs a week is the cadence; the old
+  // daily-times-three-locales pace is what produced the corpus Google refused
+  // to index.
+  let published = 0;
   for (const topic of topics) {
+    if (published >= 1) break;
     // Every post gets its OWN photo or it does not ship. There is no shared
     // fallback pool any more: a skipped post costs one slot, a repeated cover
     // costs the whole set its credibility as original content.
@@ -345,7 +349,7 @@ async function main() {
     // Collect each locale's MDX so we can mirror the post to the DB after the
     // files are on disk.
     const perLocale = {};
-    for (const locale of ["en", "zh", "es"]) {
+    for (const locale of LOCALES) {
       console.log(`Writing ${locale}/${topic.slug}.mdx`);
       let content = await generatePost(topic, locale);
       // Force the frontmatter image to the resolved path so every locale shares
@@ -367,6 +371,13 @@ async function main() {
         err?.message ?? err,
       );
     }
+
+    published++;
+    console.log(`Published ${topic.slug} (cluster: ${topic.cluster ?? "n/a"})`);
+  }
+
+  if (published === 0) {
+    console.warn("No post published this run - no candidate had a usable cover.");
   }
 
   console.log(`\nDone. Created ${topics.length * 3} files for ${topics.length} posts.`);
