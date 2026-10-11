@@ -281,13 +281,35 @@ async function generateTopics() {
   return JSON.parse(jsonMatch[0]);
 }
 
-async function generatePost(topic, locale) {
+async function generatePost(topic, locale, planPrices) {
   const localeNames = { en: "English", zh: "Chinese (Simplified)", es: "Spanish" };
   const authors = { en: "Nexitel Team", zh: "Nexitel 团队", es: "Equipo Nexitel" };
 
-  const countryContext = topic.targetCountry
-    ? `TARGET COUNTRY: ${topic.targetCountry}. Write specifically for readers from/in ${topic.targetCountry}. Reference local carriers, currencies, visa situations, common immigration paths, family connections, and pain points relevant to ${topic.targetCountry}. Use phrases and examples a ${topic.targetCountry} reader would recognize.`
-    : "";
+  // The ONLY prices the writer is allowed to state, read from the live catalog.
+  // Previously the writer was given no price facts at all and invented them -
+  // "$6/mo" for a $5 plan, and "$2" plans that do not exist. Validation caught
+  // those, but a writer with the real numbers does not produce them.
+  const priceFacts = [...planPrices.entries()]
+    .map(([name, price]) => `  - ${name}: $${price}/month`)
+    .join("\n");
+
+  // Hard limits restated at the point of writing. The topic brief's rules were
+  // not reaching this prompt: it still carried a TARGET COUNTRY instruction
+  // telling the writer to reference visa situations and immigration paths -
+  // the persona pattern the topic brief bans. That instruction is gone.
+  const factsBlock = `VERIFIED PLAN PRICES - these are the ONLY prices you may state:
+${priceFacts}
+
+PRICE RULES:
+- Never state a price that is not in the list above. Do not estimate, round, or invent.
+- "Plans from $X" must use the cheapest price in the relevant family.
+- If you are unsure of a number, describe it in words instead of giving a figure.
+
+ABSOLUTE PROHIBITIONS - a post breaking any of these is discarded unpublished:
+- No nationality-plus-occupation or nationality-plus-group framing. Not "Taiwanese families", not "Indian students", not "Egyptian market". Write for a role (a reseller, a fleet manager, someone switching carriers), never for a nationality.
+- No order minimums, minimum quantities, or "start with N SIMs" figures.
+- No margins, markups, commissions or reseller profit figures.
+- No invented statistics. If you have no source for a number, omit it.`;
 
   const prompt = `Write a complete blog post in ${localeNames[locale]} for the following topic:
 
@@ -296,7 +318,7 @@ Slug: ${topic.slug}
 Description: ${topic.description}
 Category: ${topic.category}
 Date: ${today}
-${countryContext}
+${factsBlock}
 
 For ${locale === "en" ? "English" : locale === "zh" ? "Chinese" : "Spanish"}, write the title and description naturally in that language (don't just translate word-for-word — adapt culturally for the target country audience). Use the title and description in the frontmatter in the target language.
 
@@ -364,7 +386,7 @@ async function main() {
     const perLocale = {};
     for (const locale of LOCALES) {
       console.log(`Writing ${locale}/${topic.slug}.mdx`);
-      let content = await generatePost(topic, locale);
+      let content = await generatePost(topic, locale, planPrices);
       // Force the frontmatter image to the resolved path so every locale shares
       // the same cover and the LLM can't drift from the chosen photo.
       content = content.replace(/^image:\s*.*$/m, `image: "${imagePath}"`);
