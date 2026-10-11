@@ -14,6 +14,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
+import { fetchPlanPrices, validatePost } from "./lib/validate-post.mjs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { publishPostToDb } from "./lib/publish-db.mjs";
@@ -325,6 +326,18 @@ Output ONLY the file content, nothing else.`;
 async function main() {
   console.log(`Generating posts for ${today}...`);
 
+  // Read the live plan catalog up front. If it cannot be read the run stops:
+  // publishing prices we cannot verify is how $6 reached a page for a $5 plan.
+  let planPrices;
+  try {
+    planPrices = await fetchPlanPrices();
+    console.log(`Plan catalog: ${planPrices.size} plans loaded for validation.`);
+  } catch (err) {
+    console.error(`ABORT: ${err.message}`);
+    process.exitCode = 1;
+    return;
+  }
+
   const topics = await generateTopics();
   console.log("Generated topics:", topics.map((t) => t.slug));
 
@@ -359,6 +372,22 @@ async function main() {
       if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
       writeFileSync(join(dir, `${topic.slug}.mdx`), content + "\n", "utf8");
       perLocale[locale] = content;
+    }
+
+    // The brief states its rules as prohibitions, and the model does not always
+    // honour them. This is where they are actually enforced.
+    const check = validatePost(
+      {
+        title: topic.title,
+        description: topic.description,
+        body: perLocale.en ?? "",
+      },
+      planPrices,
+    );
+    if (!check.ok) {
+      console.warn(`SKIP ${topic.slug}: failed validation, not published.`);
+      for (const problem of check.problems) console.warn(`   - ${problem}`);
+      continue;
     }
 
     // Files are written (the source of truth). Now mirror to Supabase.
