@@ -185,6 +185,34 @@ function getExistingSlugs() {
 const existingSlugs = getExistingSlugs();
 console.log(`Found ${existingSlugs.length} existing posts.`);
 
+/**
+ * The 12 most recently published titles.
+ *
+ * Slugs alone do not prevent a near-duplicate: the generator produced both
+ * "How Long Does Porting Your Number to Prepaid Take?" and "How Long Does
+ * Prepaid Number Porting Actually Take?" - different slugs, same question.
+ * Titles let the model see what has actually been answered recently, and
+ * running it several times in a row stops concentrating on one cluster.
+ */
+async function recentTitles() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return [];
+  try {
+    const db = createClient(url, key, { auth: { persistSession: false } });
+    const { data } = await db
+      .from("blog_posts")
+      .select("title_en,published_at")
+      .eq("published", true)
+      .order("published_at", { ascending: false })
+      .limit(12);
+    return (data ?? []).map((r) => r.title_en).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+const recent = await recentTitles();
+
 const SYSTEM_PROMPT = `You are an SEO content writer for Nexitel, a US prepaid wireless carrier targeting specific international audiences.
 
 Nexitel offers:
@@ -241,6 +269,14 @@ HARD RULES:
 
 DO NOT pick any of these existing topics (filenames):
 ${existingSlugs.join("\n")}
+
+RECENTLY PUBLISHED - do not answer substantially the same question as any of
+these, even with different wording, and prefer a cluster none of them used:
+${recent.length ? recent.map((t) => `- ${t}`).join("\n") : "- (none yet)"}
+
+A topic is a duplicate if a reader who found one would consider the other the
+same article. "How long does porting take?" and "How long does number porting
+actually take?" are the same topic. Pick a genuinely different question.
 
 GOOD EXAMPLES of the shape wanted (generate fresh ones, do not reuse these):
 - "Does Wi-Fi calling let a US number work from abroad?"
