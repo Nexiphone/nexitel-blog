@@ -302,8 +302,16 @@ ${priceFacts}
 
 PRICE RULES:
 - Never state a price that is not in the list above. Do not estimate, round, or invent.
+- When you name a plan, use that plan's exact price from the list. Do not attach one plan's price to another.
 - "Plans from $X" must use the cheapest price in the relevant family.
 - If you are unsure of a number, describe it in words instead of giving a figure.
+
+NEXITALK HAS NO PRICE. NexiTalk has not launched. It is NOT in the list above,
+so it has no price you may state - no monthly fee, no per-minute rate, no
+"Basic/Global/Premium" tiers, no "starting at" figure, in any language. Link to
+it and describe what it does if relevant, but every post that attaches a number
+to NexiTalk is discarded unpublished. This is the single most common reason a
+draft is rejected.
 
 ABSOLUTE PROHIBITIONS - a post breaking any of these is discarded unpublished:
 - No nationality-plus-occupation or nationality-plus-group framing. Not "Taiwanese families", not "Indian students", not "Egyptian market". Write for a role (a reseller, a fleet manager, someone switching carriers), never for a nationality.
