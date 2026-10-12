@@ -45,6 +45,15 @@ const BANNED = [
     why: "order minimums are a dealer conversation, never published",
   },
   {
+    name: "price for an unlaunched product",
+    // NexiTalk still ships a "SOON" badge in the site nav. A post invented
+    // "$4.99/month" for it - twice - and the per-plan price check could not
+    // see it because NexiTalk is not in the /plans catalog. No figure may be
+    // attached to it until it launches and has a catalog entry.
+    re: /NexiTalk(?:[^.]|\.(?=\d)){0,60}\$\d|\$\d(?:[^.]|\.(?=\d)){0,60}NexiTalk/i,
+    why: "NexiTalk is unlaunched; quoting a price for it invents a fact",
+  },
+  {
     name: "dealer-recruitment topic",
     re: /\b(become|becoming)\s+(a|an)\s+(us\s+)?(carrier\s+)?(dealer|distributor|reseller|master agent)\b|\bstart (a|your own) (sim|wireless|prepaid|resale) business\b|\bresell(ing)? (us )?prepaid\b|\breseller (program|economics|margins)\b/i,
     why: "dealer recruitment belongs on the NexiVolt blog, not here",
