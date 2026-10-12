@@ -45,6 +45,11 @@ const BANNED = [
     why: "order minimums are a dealer conversation, never published",
   },
   {
+    name: "dealer-recruitment topic",
+    re: /\b(become|becoming)\s+(a|an)\s+(us\s+)?(carrier\s+)?(dealer|distributor|reseller|master agent)\b|\bstart (a|your own) (sim|wireless|prepaid|resale) business\b|\bresell(ing)? (us )?prepaid\b|\breseller (program|economics|margins)\b/i,
+    why: "dealer recruitment belongs on the NexiVolt blog, not here",
+  },
+  {
     name: "margin or commission",
     re: /\b(profit\s+)?margins?\b|\bmarkup\b|\bcommission\s+(rate|structure|per)\b/i,
     why: "margins are a dealer conversation, never published",

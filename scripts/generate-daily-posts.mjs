@@ -216,20 +216,20 @@ Write helpful, informative posts that solve REAL problems these audiences face. 
 
 const TOPIC_GENERATION_PROMPT = `Generate 2 candidate SEO blog post topics for Nexitel, a US prepaid wireless carrier. Only ONE will be published — the second is a spare in case the first cannot be produced.
 
-Nexitel sells to two audiences, and BOTH are business-critical:
-1. DEALERS AND DISTRIBUTORS, mostly outside the US, who buy prepaid SIMs and eSIMs in bulk and resell them.
-2. END USERS in the US who activate a line on nexitel.us.
+This blog serves ONE audience: people and businesses who will activate a Nexitel line on nexitel.us.
+
+Dealer and distributor recruitment is NOT this blog's job - that content lives on the NexiVolt blog. Do not write about becoming a reseller, distributor or master agent, buying SIMs wholesale, reseller economics, or building a SIM resale business. Those topics compete with NexiVolt for the same searches and must not appear here.
 
 Products: Nexitel Blue runs on the AT&T network. Nexitel Purple runs on the T-Mobile network. Both nationwide 5G, prepaid, no contract, no credit check. Physical SIM and eSIM. Plans from $5/month. Several Blue plans include calling to 100+ countries.
 
 PICK THE TOPIC FROM ONE OF THESE CLUSTERS. These are the only areas with demonstrated search demand — do not invent others:
 
-- BULK / DEALER: buying US SIMs in bulk, becoming a US carrier distributor, bulk activation, eSIM at volume, supplying US numbers to businesses abroad
 - PLANS AND PRICING: comparing Blue vs Purple, cheapest US prepaid plans, what $5-$35 a month actually buys, prepaid vs postpaid
 - PORTING / SWITCHING: keeping your number when switching, porting from another carrier, what happens to your old plan
 - ROAMING AND INTERNATIONAL: using a US number abroad, Wi-Fi calling overseas, international calling included in a plan, avoiding roaming charges
 - ESIM: activation, eSIM vs physical SIM, dual SIM, provisioning devices
 - IOT / M2M: data-only plans, fleet tracking, connected devices
+- BUSINESS LINES: a company putting its team on US numbers, using a US number from overseas over Wi-Fi, a real carrier line vs a virtual number. Write for the business that USES the lines, never for one reselling them.
 
 HARD RULES:
 - Write for someone deciding whether to BUY or RESELL, not for a general reader.
@@ -243,7 +243,7 @@ DO NOT pick any of these existing topics (filenames):
 ${existingSlugs.join("\n")}
 
 GOOD EXAMPLES of the shape wanted (generate fresh ones, do not reuse these):
-- "How many SIMs do you need to start reselling US prepaid?"
+- "Does Wi-Fi calling let a US number work from abroad?"
 - "Blue or Purple: which Nexitel network covers your area better"
 - "What happens to your old number when you port to prepaid"
 - "Does Wi-Fi calling work on a US number overseas?"
@@ -258,7 +258,7 @@ Return ONLY a JSON array (no markdown, no commentary):
     "description": "SEO meta description, 150-160 chars",
     "category": "Guide" | "Plans" | "Technology" | "Comparison",
     "photoQuery": "2-4 word stock-photo search query",
-    "cluster": "bulk" | "plans" | "porting" | "roaming" | "esim" | "iot"
+    "cluster": "plans" | "porting" | "roaming" | "esim" | "iot" | "business"
   },
   { ... }
 ]
