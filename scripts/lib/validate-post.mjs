@@ -77,7 +77,7 @@ function priceProblems(text, prices) {
     for (const label of new Set([name, short])) {
       if (!label) continue;
       const re = new RegExp(
-        `${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[^.$]{0,80}\\$(\\d+(?:\\.\\d{2})?)`,
+        `${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[^.$\\n]{0,80}\\$(\\d+(?:\\.\\d{2})?)`,
         "gi",
       );
       let m;
