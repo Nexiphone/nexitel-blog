@@ -1,0 +1,65 @@
+[
+  {
+    "slug": "activate-us-esim-from-outside-the-us-2026",
+    "title": "Can You Activate a US eSIM From Outside the US?",
+    "description": "Yes, you can buy and activate a Nexitel eSIM from anywhere in the world. Here is what you need first: Wi-Fi, Wi-Fi Calling on, and a supported phone.",
+    "category": "Guide",
+    "cluster": "esim",
+    "photoQuery": "traveler phone airport cafe",
+    "facts": "You can buy and activate a Nexitel eSIM anywhere in the world; the phone never needs to be in the US. The eSIM QR code arrives by email, usually within minutes. You need a Wi-Fi connection and Wi-Fi Calling enabled in the phone settings. Availability depends on the country and the device: some countries restrict Wi-Fi calling, and some carrier-locked phones do not support it. Readers should confirm their device supports Wi-Fi Calling before buying.",
+    "status": "queued"
+  },
+  {
+    "slug": "whatsapp-verification-us-number-from-abroad-2026",
+    "title": "Verifying WhatsApp on a US Number From Abroad",
+    "description": "How to verify WhatsApp on a US prepaid number while outside the US, and why the Call me option over Wi-Fi Calling is more reliable than an SMS code.",
+    "category": "Guide",
+    "cluster": "roaming",
+    "photoQuery": "person using phone cafe window",
+    "facts": "Verification codes are received over Wi-Fi Calling. Nexitel recommends choosing WhatsApp's \"Call me\" option rather than SMS, because it is the more reliable route from outside the United States. SMS on Nexitel works between US mobile numbers only.",
+    "status": "queued"
+  },
+  {
+    "slug": "us-number-text-messages-from-outside-the-us-2026",
+    "title": "Do Texts Work on a US Number From Outside the US?",
+    "description": "Texting on a US prepaid number works between US numbers only. What that means when you live or travel abroad, and why calls over Wi-Fi work anywhere.",
+    "category": "Guide",
+    "cluster": "roaming",
+    "photoQuery": "woman texting balcony city",
+    "facts": "SMS works between US mobile numbers only. Texts to and from non-US numbers are not supported. Calls work over Wi-Fi Calling from anywhere in the world.",
+    "status": "queued"
+  },
+  {
+    "slug": "us-prepaid-line-abroad-without-roaming-2026",
+    "title": "No Roaming: How a US Prepaid Line Works Abroad",
+    "description": "Nexitel lines do not roam on foreign cellular networks. How your US number still works overseas over Wi-Fi Calling, and what to plan before you travel.",
+    "category": "Guide",
+    "cluster": "roaming",
+    "photoQuery": "suitcase hotel room window",
+    "facts": "Nexitel does not provide international roaming. A Nexitel line works abroad over Wi-Fi Calling only, not on a local cellular network. Do NOT say any plan includes roaming or works on foreign networks.",
+    "status": "queued"
+  },
+  {
+    "slug": "does-mms-picture-messaging-work-on-prepaid-2026",
+    "title": "Does Picture Messaging (MMS) Work on Prepaid?",
+    "description": "MMS works between US numbers on plans that include data, and every Nexitel Blue plan supports it. What to check before you rely on picture messages.",
+    "category": "Technology",
+    "cluster": "plans",
+    "photoQuery": "friends sharing photos phone",
+    "facts": "MMS works between US numbers on plans that include data. All Nexitel Blue plans support MMS. Do not claim MMS works to or from non-US numbers.",
+    "status": "queued"
+  },
+  {
+    "slug": "keep-same-us-prepaid-number-for-years-2026",
+    "title": "How to Keep the Same US Prepaid Number for Years",
+    "description": "Your number stays yours for as long as the plan is active. How recharging keeps it, and why an expired plan leaves only 3 days before the number is lost.",
+    "category": "Guide",
+    "cluster": "plans",
+    "photoQuery": "calendar desk coffee morning",
+    "facts": "A Nexitel number can be kept for years, for as long as the plan stays active. Customers recharge on the Nexitel website at https://www.nexitel.us/recharge. If a plan expires, the customer has 3 days to recharge before the number is lost.",
+    "extraLinks": [
+      "https://www.nexitel.us/recharge"
+    ],
+    "status": "queued"
+  }
+]

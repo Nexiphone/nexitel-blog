@@ -213,6 +213,37 @@ async function recentTitles() {
 }
 const recent = await recentTitles();
 
+/**
+ * Hand-picked topics, published ahead of any model-generated one.
+ *
+ * content/topic-queue.json holds questions taken from the nexitel.us FAQ. Each
+ * entry carries `facts`: the answer as published on the site, which the post
+ * must agree with. A queued topic is tried first each run; the model's
+ * candidates stay behind it as spares. On success the entry is marked
+ * "published" (the workflow commits the file), so the queue drains one per run.
+ */
+const QUEUE_PATH = join(ROOT, "content", "topic-queue.json");
+
+function readQueue() {
+  if (!existsSync(QUEUE_PATH)) return [];
+  return JSON.parse(readFileSync(QUEUE_PATH, "utf8"));
+}
+
+function nextQueuedTopic(queue) {
+  // A slug already on disk was attempted before (a failed validation still
+  // leaves its files behind) - skip it rather than retry it forever.
+  return queue.find((t) => t.status === "queued" && !existingSlugs.includes(t.slug)) ?? null;
+}
+
+function markQueuedPublished(slug) {
+  const queue = readQueue();
+  const entry = queue.find((t) => t.slug === slug);
+  if (!entry) return;
+  entry.status = "published";
+  entry.publishedOn = today;
+  writeFileSync(QUEUE_PATH, JSON.stringify(queue, null, 2) + "\n");
+}
+
 const SYSTEM_PROMPT = `You are an SEO content writer for Nexitel, a US prepaid wireless carrier targeting specific international audiences.
 
 Nexitel offers:
@@ -363,7 +394,13 @@ Description: ${topic.description}
 Category: ${topic.category}
 Date: ${today}
 ${factsBlock}
-
+${topic.facts ? `
+TOPIC FACTS - this is the answer Nexitel publishes on its own site. The post
+must agree with every statement here and must not contradict any of them:
+${topic.facts}
+` : ""}${topic.extraLinks?.length ? `
+For this post you may ALSO link to: ${topic.extraLinks.join(", ")}
+` : ""}
 For ${locale === "en" ? "English" : locale === "zh" ? "Chinese" : "Spanish"}, write the title and description naturally in that language (don't just translate word-for-word — adapt culturally for the target country audience). Use the title and description in the frontmatter in the target language.
 
 Output the COMPLETE MDX file content (frontmatter + body). Frontmatter format:
@@ -404,8 +441,11 @@ async function main() {
     return;
   }
 
-  const topics = await generateTopics();
-  console.log("Generated topics:", topics.map((t) => t.slug));
+  // A queued topic goes first; the model's candidates are spares behind it.
+  const queued = nextQueuedTopic(readQueue());
+  if (queued) console.log(`Queued topic first: ${queued.slug}`);
+  const topics = [...(queued ? [queued] : []), ...(await generateTopics())];
+  console.log("Candidate topics:", topics.map((t) => t.slug));
 
   // ONE post per run. The model returns two candidates so that a topic whose
   // cover cannot be sourced does not cost the whole run - the second is a
@@ -467,6 +507,7 @@ async function main() {
       );
     }
 
+    if (topic === queued) markQueuedPublished(topic.slug);
     published++;
     console.log(`Published ${topic.slug} (cluster: ${topic.cluster ?? "n/a"})`);
   }
