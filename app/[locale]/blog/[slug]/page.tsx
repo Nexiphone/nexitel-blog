@@ -319,7 +319,7 @@ export default function BlogPostPage({ params }: Props) {
             <p className="text-gray-400 mb-6">{t.contact.subtitle}</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
-                href="https://wa.me/18082006178"
+                href="https://wa.me/16462423257"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1da851] text-white font-medium px-5 py-2.5 rounded-lg transition-colors w-full sm:w-auto justify-center"
