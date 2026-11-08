@@ -59,6 +59,32 @@ const BANNED = [
     why: "dealer recruitment belongs on the NexiVolt blog, not here",
   },
   {
+    name: "port-in promise",
+    // Nexitel does not port numbers in; 15 live posts said it did (2026-11-08).
+    re: /\b(port|transfer|bring|keep)(ing)?\s+(your|my)\s+(existing\s+|current\s+)?(phone\s+)?number\s+(to|into|over to)\s+nexitel|port my existing number|携号转网至?\s*Nexitel|porta(r|bilidad)[^.]{0,40}a Nexitel/i,
+    why: "Nexitel does not port numbers in; every line gets a new number",
+  },
+  {
+    name: "roaming promise",
+    re: /\broaming in \d+\+? countries|\b\d+\+? countries? (of|with) roaming|nexitel[^.]{0,60}\b(includes?|with|offers?)\b[^.]{0,30}roaming|roaming day pass/i,
+    why: "no Nexitel plan includes international roaming",
+  },
+  {
+    name: "auto-renew promise",
+    re: /\b(renews?|renewing) automatically\b|\bauto-?renew(s|al)? (is|are)? ?(on|enabled|available)|\bset up auto-?pay\b|\bautopay\b/i,
+    why: "plans never auto-renew; customers renew at /recharge",
+  },
+  {
+    name: "phone support line",
+    re: /\b(dial|call)\s+611\b|\b611\b[^.]{0,30}(support|customer service)/i,
+    why: "support is chat and email only; there is no 611 line",
+  },
+  {
+    name: "unlaunched or separate product",
+    re: /\bNexiTalk\b|\bNexi ?Volt\b/i,
+    why: "NexiTalk has not launched and Nexi Volt is a separate business",
+  },
+  {
     name: "margin or commission",
     re: /\b(profit\s+)?margins?\b|\bmarkup\b|\bcommission\s+(rate|structure|per)\b/i,
     why: "margins are a dealer conversation, never published",
