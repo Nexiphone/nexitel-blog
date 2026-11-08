@@ -217,10 +217,20 @@ const SYSTEM_PROMPT = `You are an SEO content writer for Nexitel, a US prepaid w
 
 Nexitel offers:
 - Nexitel Blue Plans — AT&T network, from $10/mo. Link: https://www.nexitel.us/plans
-- Nexitel Purple Plans — T-Mobile network, from $6/mo. Link: https://www.nexitel.us/plans
+- Nexitel Purple Plans — T-Mobile network, from $5/mo. Link: https://www.nexitel.us/plans
 - All plans page: https://www.nexitel.us/plans
-- NexiTalk VoIP — international calling from $4.99/mo. Link: https://www.nexitel.us/nexitalk
-- Nexi Volt — global mobile recharge/top-up service. Mention by name only, do NOT link it.
+- Buy a plan (eSIM by email): https://www.nexitel.us/activate
+- Renew a plan: https://www.nexitel.us/recharge
+
+WHAT NEXITEL DOES NOT DO - never claim otherwise, in any language:
+- No porting a number in. Every activation gets a NEW US number. Never write "keep your number", "bring your number" or "port your number to Nexitel".
+- No moving a line between Blue and Purple. A different network means a new SIM, plan and number.
+- No international roaming on any plan. Abroad, Wi-Fi Calling reaches US numbers over Wi-Fi.
+- No auto-renew, autopay or recurring billing. Customers renew every 30 days at /recharge.
+- No phone support line and no "611". Support is website chat and email.
+- No data-only, IoT, unlimited-data, family or add-on plans. Only the plans in the price list exist.
+- Nexitel does not sell or ship physical SIMs online; online purchases are eSIM.
+- Do not mention NexiTalk or Nexi Volt.
 
 TARGET AUDIENCES (PRIORITY ORDER):
 1. 🇮🇳 INDIANS — students on F-1 visa, H1B workers, tourists, immigrants, families connecting between USA & India. Mention Jio/Airtel/Vi top-ups, calls to India, USIE/H1B/L1 situations.
@@ -237,7 +247,7 @@ Write helpful, informative posts that solve REAL problems these audiences face. 
 - Start with an H2 heading (NOT H1)
 - Use H2/H3 for structure
 - Include bullet points and numbered lists
-- Link to https://www.nexitel.us/plans and https://www.nexitel.us/nexitalk (these are the only valid link targets — never invent other paths)
+- Link to https://www.nexitel.us/plans, https://www.nexitel.us/activate and https://www.nexitel.us/recharge (these are the only valid link targets — never invent other paths)
 - End with a strong CTA
 - NOT include any "Contact Us" section (handled by the layout)
 - Be informative and helpful, not salesy`;
@@ -248,21 +258,22 @@ This blog serves ONE audience: people and businesses who will activate a Nexitel
 
 Dealer and distributor recruitment is NOT this blog's job - that content lives on the NexiVolt blog. Do not write about becoming a reseller, distributor or master agent, buying SIMs wholesale, reseller economics, or building a SIM resale business. Those topics compete with NexiVolt for the same searches and must not appear here.
 
-Products: Nexitel Blue runs on the AT&T network. Nexitel Purple runs on the T-Mobile network. Both nationwide 5G, prepaid, no contract, no credit check. Physical SIM and eSIM. Plans from $5/month. Several Blue plans include calling to 100+ countries.
+Products: Nexitel Blue runs on the AT&T network. Nexitel Purple runs on the T-Mobile network. Both nationwide 5G, prepaid, no contract, no credit check. eSIM sold online; physical SIMs come from dealers. Plans from $5/month. Several Blue plans include calling to 100+ countries. Every line gets a NEW number: Nexitel does not port numbers in. No plan includes international roaming. Plans never auto-renew.
 
 PICK THE TOPIC FROM ONE OF THESE CLUSTERS. These are the only areas with demonstrated search demand — do not invent others:
 
 - PLANS AND PRICING: comparing Blue vs Purple, cheapest US prepaid plans, what $5-$35 a month actually buys, prepaid vs postpaid
-- PORTING / SWITCHING: keeping your number when switching, porting from another carrier, what happens to your old plan
-- ROAMING AND INTERNATIONAL: using a US number abroad, Wi-Fi calling overseas, international calling included in a plan, avoiding roaming charges
+- SWITCHING TO PREPAID: leaving a contract, what to check before switching, getting a second US line (Nexitel gives a NEW number - never write about porting a number in)
+- INTERNATIONAL: Wi-Fi calling overseas to reach US numbers, international calling included in Blue plans (no Nexitel plan includes roaming - never say it does)
 - ESIM: activation, eSIM vs physical SIM, dual SIM, provisioning devices
-- IOT / M2M: data-only plans, fleet tracking, connected devices
+- DATA: how much data a phone really uses, choosing between the 500MB-10GB plans (there are no data-only or IoT plans)
 - BUSINESS LINES: a company putting its team on US numbers, using a US number from overseas over Wi-Fi, a real carrier line vs a virtual number. Write for the business that USES the lines, never for one reselling them.
 
 HARD RULES:
 - Write for someone deciding whether to BUY or RESELL, not for a general reader.
 - NO nationality-plus-occupation topics. Nothing shaped like "Indian student", "Filipino nurse", "Taiwanese researcher". That pattern produced hundreds of near-identical posts Google refused to index, and every one has been unpublished.
-- NO posts about sending mobile recharge home, remittances, or NexiTalk. Different products.
+- NO posts about sending mobile recharge home, remittances, NexiTalk or Nexi Volt. Different products.
+- NO posts about porting a number into Nexitel, international roaming, auto-renew, or data-only/IoT plans. Nexitel offers none of these.
 - NEVER promise a specific price, allowance or minimum order beyond the ranges above. Pricing, margins and order minimums are never published.
 - AT&T and T-Mobile may be named in plain text as the underlying networks. Never imply partnership or endorsement.
 - The topic must be answerable concretely. Prefer a real question a buyer types into Google over a broad theme.
@@ -275,13 +286,13 @@ these, even with different wording, and prefer a cluster none of them used:
 ${recent.length ? recent.map((t) => `- ${t}`).join("\n") : "- (none yet)"}
 
 A topic is a duplicate if a reader who found one would consider the other the
-same article. "How long does porting take?" and "How long does number porting
-actually take?" are the same topic. Pick a genuinely different question.
+same article. "Is eSIM better than a physical SIM?" and "eSIM or physical SIM:
+which should you pick?" are the same topic. Pick a genuinely different question.
 
 GOOD EXAMPLES of the shape wanted (generate fresh ones, do not reuse these):
 - "Does Wi-Fi calling let a US number work from abroad?"
 - "Blue or Purple: which Nexitel network covers your area better"
-- "What happens to your old number when you port to prepaid"
+- "How much data does a phone use in a month on Wi-Fi most of the day"
 - "Does Wi-Fi calling work on a US number overseas?"
 - "eSIM vs physical SIM for a bulk deployment"
 - "What a $15 US prepaid plan actually includes in 2026"
@@ -294,7 +305,7 @@ Return ONLY a JSON array (no markdown, no commentary):
     "description": "SEO meta description, 150-160 chars",
     "category": "Guide" | "Plans" | "Technology" | "Comparison",
     "photoQuery": "2-4 word stock-photo search query",
-    "cluster": "plans" | "porting" | "roaming" | "esim" | "iot" | "business"
+    "cluster": "plans" | "switching" | "international" | "esim" | "data" | "business"
   },
   { ... }
 ]
@@ -342,18 +353,14 @@ PRICE RULES:
 - "Plans from $X" must use the cheapest price in the relevant family.
 - If you are unsure of a number, describe it in words instead of giving a figure.
 
-NEXITALK HAS NO PRICE. NexiTalk has not launched. It is NOT in the list above,
-so it has no price you may state - no monthly fee, no per-minute rate, no
-"Basic/Global/Premium" tiers, no "starting at" figure, in any language. Link to
-it and describe what it does if relevant, but every post that attaches a number
-to NexiTalk is discarded unpublished. This is the single most common reason a
-draft is rejected.
+NEXITALK HAS NOT LAUNCHED. Do not mention NexiTalk or Nexi Volt at all.
 
 ABSOLUTE PROHIBITIONS - a post breaking any of these is discarded unpublished:
 - No nationality-plus-occupation or nationality-plus-group framing. Not "Taiwanese families", not "Indian students", not "Egyptian market". Write for a role (a reseller, a fleet manager, someone switching carriers), never for a nationality.
 - No order minimums, minimum quantities, or "start with N SIMs" figures.
 - No margins, markups, commissions or reseller profit figures.
-- No invented statistics. If you have no source for a number, omit it.`;
+- No invented statistics. If you have no source for a number, omit it.
+- No porting a number in, no roaming, no auto-renew/autopay, no 611 or phone support, no data-only/IoT plans: Nexitel offers none of these.`;
 
   const prompt = `Write a complete blog post in ${localeNames[locale]} for the following topic:
 
@@ -376,7 +383,7 @@ author: "${authors[locale]}"
 image: "PLACEHOLDER"   # overwritten with the fetched cover path
 ---
 
-Then the body: ~80-110 lines of markdown, starting with H2. Use H2/H3, bullets, numbered lists. Link to https://www.nexitel.us/plans and https://www.nexitel.us/nexitalk only. Mention NexiTalk and Nexi Volt by name where relevant, but do not link Nexi Volt. End with a strong CTA. No "Contact Us" section.
+Then the body: ~80-110 lines of markdown, starting with H2. Use H2/H3, bullets, numbered lists. Link to https://www.nexitel.us/plans, https://www.nexitel.us/activate and https://www.nexitel.us/recharge only. Do not mention NexiTalk or Nexi Volt. End with a strong CTA. No "Contact Us" section.
 
 Output ONLY the file content, nothing else.`;
 
