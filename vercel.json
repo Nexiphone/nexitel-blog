@@ -1,7 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "regions": ["iad1"],
+  "regions": [
+    "iad1"
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -23,6 +25,33 @@
           "value": "strict-origin-when-cross-origin"
         }
       ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/en/blog/:slug",
+      "destination": "https://www.nexitel.us/blog/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/:locale(zh|es)/blog/:slug",
+      "destination": "https://www.nexitel.us/:locale/blog/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/:locale(zh|es)",
+      "destination": "https://www.nexitel.us/:locale/blog",
+      "permanent": true
+    },
+    {
+      "source": "/:locale(zh|es)/:path*",
+      "destination": "https://www.nexitel.us/:locale/blog",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "destination": "https://www.nexitel.us/blog",
+      "permanent": true
     }
   ]
 }
